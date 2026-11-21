@@ -22,7 +22,7 @@ Observed behavior:
 
 ## What it converts (observed)
 
-Run on tests/fixtures/strategies/LegacyV2.py (a copy under tests/out/updater/):
+Run on tests/fixtures/strategies/LegacyV2.py (the test script uses a copy under tests/out/migration/updated/). `trade.nr_of_successful_buys` to `trade.nr_of_successful_entries` is asserted by the script too.
 
 - Adds `INTERFACE_VERSION = 3` as the first class member (or sets an existing value to 3). Only for classes whose base is literally `IStrategy`.
 - Method names: `populate_buy_trend`, `populate_sell_trend`, `custom_sell`, `check_buy_timeout`, `check_sell_timeout`.
@@ -38,7 +38,7 @@ The converted LegacyV2 backtested with identical trades to the original and to t
 
 ## What it does NOT convert (observed)
 
-Verified on the LegacyV2 copy or on a small scratch strategy (items 5 and 6 come from reading the updater source, not from a run). Also grep yourself for exit reason strings such as `sell_signal`, `custom_sell`, `force_sell`, `emergency_sell` in comparisons.
+Items 1 to 4 are reproducible from the repo: the fixture tests/fixtures/strategies/LegacyV2.py contains each pattern and `tests/test_migration_fixtures.sh` asserts the gap on the converted copy. Items 5 and 6 come from reading the updater source, not from a run. Also grep yourself for exit reason strings such as `sell_signal`, `custom_sell`, `force_sell`, `emergency_sell` in comparisons.
 
 1. `order_types` keys `emergencysell`, `forcesell`, `forcebuy` stay unchanged (`emergency_exit`, `force_exit`, `force_entry` are the new names). Freqtrade still logs a `DEPRECATED` warning for them.
 2. No `side` argument is added to `custom_stake_amount`, `confirm_trade_entry` or `custom_entry_price`, and `custom_entry_price` does not get the `trade` argument. Old signatures keep working only because of `**kwargs`; futures and shorts need `side`.
@@ -49,7 +49,7 @@ Verified on the LegacyV2 copy or on a small scratch strategy (items 5 and 6 come
 
 ## What it breaks or changes silently (observed hazards)
 
-Run on a scratch strategy (tests/out/updater2/, not committed):
+Scratch-only, not reproducible from the repo (run on a throwaway strategy, tests/out/updater2/, not committed; these patterns break a running strategy so they are not in the fixtures; re-run them yourself before relying on the exact output):
 
 - A local variable named `sell` or `buy` is renamed where it is assigned (`sell = ...` became `exit_long = ...`) but not where it is used inside a subscript (`dataframe.loc[sell, ...]` stayed `sell`). Result: `NameError` at run time. Grep for any variable or function argument named `buy`, `sell`, `buy_tag`.
 - Every string constant equal to `buy` or `sell` is rewritten to `entry` / `exit`, and every string equal to a mapped name is rewritten too. Observed: the tag in `(1, "buy")` became `'entry'`. A tag, exit reason or dict key named `buy` / `sell` changes value silently, which can change logic that compares tags.

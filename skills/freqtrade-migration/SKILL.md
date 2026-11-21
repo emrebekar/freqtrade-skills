@@ -1,6 +1,6 @@
 ---
 name: freqtrade-migration
-description: Use when you need to update an old Freqtrade strategy or config (interface v2 or earlier) to the current interface version 3, fix DEPRECATED warnings, rename buy/sell to entry/exit, or run freqtrade strategy-updater. Covers populate_buy_trend to populate_entry_trend, populate_sell_trend to populate_exit_trend, buy/sell/buy_tag columns to enter_long/exit_long/enter_tag, custom_sell, check_buy_timeout, sell_reason, use_sell_signal, order_types, unfilledtimeout, bid_strategy, INTERFACE_VERSION, removed features (populate_any_indicators, edge, hdf5, ticker_interval), and checking that a migration kept the same trades.
+description: Use when you need to update an old Freqtrade strategy or config (interface v2 or earlier) to the current interface version 3, fix DEPRECATED warnings, rename buy/sell to entry/exit, or run freqtrade strategy-updater. Covers populate_buy_trend to populate_entry_trend, populate_sell_trend to populate_exit_trend, buy/sell/buy_tag columns to enter_long/exit_long/enter_tag, custom_sell, check_buy_timeout, sell_reason, use_sell_signal, order_types, unfilledtimeout, bid_strategy, INTERFACE_VERSION, removed features (populate_any_indicators, edge, hdf5, ticker_interval), the funding_rate column and 1h funding timeframe change, and checking that a migration kept the same trades.
 license: GPL-3.0
 ---
 
@@ -14,7 +14,7 @@ Rules:
 - Migration is renaming plus new arguments, not a redesign. Do not change signal logic, ROI, stoploss or parameters while migrating; propose those separately.
 - Keep a copy of the original strategy and its backtest result before changing anything.
 - Read the whole old strategy and config first. Look names up in the references; do not invent renames. Label what you could not verify.
-- If the user wants shorts or futures, the migration is required: with a non-spot `trading_mode` the 2026.10 loader rejects old setting names (observed). Futures and shorting also need `trading_mode`, `margin_mode` and `can_short = True`; leverage can liquidate the position, warn the user.
+- If the user wants shorts or futures, the migration is required: with a non-spot `trading_mode` the 2026.10 loader rejects old names (settings: run; methods: source-read). Futures and shorting also need `trading_mode`, `margin_mode` and `can_short = True`; leverage can liquidate the position, warn the user.
 
 ## What 2026.10 does with an old strategy (observed)
 
@@ -115,11 +115,11 @@ Details of these commands: freqtrade-validation.
 ## References
 
 - references/v2-to-v3.md - full rename table with before/after code, config keys, FreqAI split, docs inconsistencies
-- references/deprecated.md - removed features and replacements (edge, hdf5, `ticker_interval`, protections in config, funding-rate timeframe), what still works in 2026.10
+- references/deprecated.md - removed features and replacements (edge, hdf5, `ticker_interval`, protections in config, funding-rate timeframe 2025.12, funding-rate data format 2026.8 with the `funding_rate` column), what still works in 2026.10
 - references/strategy-updater.md - usage, what it converts, what it misses, hazards
 
 ## Related skills
 
-freqtrade-strategy (current interface, signals, callbacks overview), freqtrade-callbacks (new callback signatures), freqtrade-config (config keys, pricing), freqtrade-backtesting (run and compare backtests), freqtrade-validation (lookahead and recursive gate), freqtrade-freqai (feature engineering split), freqtrade-hyperopt (parameter spaces).
+freqtrade-strategy (current interface, signals, funding-rate candles, callbacks overview), freqtrade-callbacks (new callback signatures), freqtrade-config (config keys, pricing), freqtrade-backtesting (run and compare backtests), freqtrade-validation (lookahead and recursive gate), freqtrade-freqai (feature engineering split), freqtrade-hyperopt (parameter spaces).
 
 Built from Freqtrade docs 2026.10 (4cf0351e08d26e96a6429ef48103b726bb230cf8). Source: https://github.com/freqtrade/freqtrade/tree/2026.10/docs

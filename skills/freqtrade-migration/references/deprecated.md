@@ -16,7 +16,7 @@ From docs/deprecated.md (2026.10): "no longer supported. Please avoid their usag
 | `"pairlist"` config section | removed 2020.4 | `"pairlists"`, a list of handlers run in sequence |
 | volume pairlist `bidVolume`, `askVolume` | removed 2020.9 | `quoteVolume` (only quote volume is comparable across assets) |
 | `order_book_min`, `order_book_max` (stepping the order book for the exit price) | removed 2021.7 | none (docs: no benefit, more risk) |
-| Separate hyperopt files (legacy hyperopt mode) | removed 2021.9 | parametrized strategies (freqtrade-hyperopt). A custom loss class in its own file is still the documented way for loss functions. |
+| Separate hyperopt files (legacy hyperopt mode) | removed 2021.9 | parametrized strategies (freqtrade-hyperopt). |
 | `"protections": []` in the config | removed 2024.10 | `protections` in the strategy (freqtrade-config) |
 | hdf5 data storage | removed 2025.1 | feather; convert with `freqtrade convert-data` before updating |
 | `--logfile systemd` / `--logfile journald` | deprecated 2025.3 | config-based log setup (docs: advanced-setup.md#advanced-logging) |
@@ -43,6 +43,17 @@ freqtrade list-data --exchange <yourexchange> --show-timerange
 ```
 
 Docs inconsistency: the docs write `freqtrade list-data --exchange <yourexchange> --show`, but 2026.10 has no `--show` option (`--show-timerange` exists), so the example above uses that. Add the config, exchange and pair options your setup needs. More on informative and funding-rate candles: freqtrade-strategy. Data download: freqtrade-setup.
+
+## Funding rate data storage format (2026.8, futures)
+
+Docs label (docs/deprecated.md, not run here): since 2026.8 funding rate data is stored with the columns it actually has, `date` and `funding_rate`. Before, it was stored as a regular candle with the rate in `open` and `high`, `low`, `close`, `volume` all 0. Existing data needs no active migration: old-layout files are detected and converted while reading, and rewritten in the new layout the next time they are stored (for example on the next `freqtrade download-data`).
+
+Strategy changes (docs):
+
+- Strategies using `dp.get_pair_dataframe(..., candle_type="funding_rate")` or `@informative("1h", candle_type="funding_rate")` should read the `funding_rate` column instead of `open`. `open` stays as a deprecated alias that "will be removed in a future version". `high`, `low`, `close`, `volume` are no longer present.
+- Funding rate dataframes are not padded: one row per funding event (usually every 1h, 4h or 8h), in backtesting and in dry/live. Merge them onto the strategy dataframe by date (`merge_informative_pair` or `@informative`). A direct column assignment aligns by position and gives wrong or mostly `NaN` values.
+
+Merge example and details: freqtrade-strategy, references/informative-pairs.md (section "Funding rate and mark candles").
 
 ## What still works in 2026.10 (observed)
 

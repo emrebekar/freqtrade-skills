@@ -32,7 +32,12 @@ bt LegacyV2 "$OUT/updated" "$OUT/updated_res" "$OUT/updated.log"; ok_log "$OUT/u
 for needle in "'forcesell'" "'forcebuy'" "'emergencysell'"; do
   grep -q "$needle" "$OUT/updated/LegacyV2.py" && echo "updater gap confirmed: $needle left unchanged" || { echo "updater gap: FAIL ($needle was converted; update the skill)"; fail=1; }
 done
-grep -q "side" "$OUT/updated/LegacyV2.py" && { echo "updater gap: FAIL (side added; update the skill)"; fail=1; } || echo "updater gap confirmed: no side argument added"
+grep -q "side: str" "$OUT/updated/LegacyV2.py" && { echo "updater gap: FAIL (side added; update the skill)"; fail=1; } || echo "updater gap confirmed: no side argument added"
+for needle in "trade.sell_reason is not None" "def custom_entry_price(self, pair: str, current_time" "return stoploss_from_open(0.07, current_profit)$" "return stoploss_from_absolute(current_rate \* 0.95, current_rate)$"; do
+  grep -q -- "$needle" "$OUT/updated/LegacyV2.py" && echo "updater gap confirmed: $needle left unchanged" || { echo "updater gap: FAIL ($needle changed; update the skill)"; fail=1; }
+done
+grep -q "trade.nr_of_successful_entries" "$OUT/updated/LegacyV2.py" && echo "updater converted: nr_of_successful_buys" || { echo "updater: FAIL (nr_of_successful_buys not converted)"; fail=1; }
+grep -q "is_short" "$OUT/updated/LegacyV2.py" && { echo "updater gap: FAIL (is_short added; update the skill)"; fail=1; } || echo "updater gap confirmed: no is_short added"
 
 # 2. buy_tag crash
 sed 's/"buy",$/["buy", "buy_tag"],/; s/\] = 1$/] = (1, "t")/' tests/fixtures/strategies/LegacyV2.py > "$OUT/buytag/LegacyV2.py"

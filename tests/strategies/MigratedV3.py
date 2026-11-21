@@ -6,7 +6,7 @@ from pandas import DataFrame
 
 import talib.abstract as ta
 from freqtrade.persistence import Order, Trade
-from freqtrade.strategy import IStrategy
+from freqtrade.strategy import IStrategy, stoploss_from_absolute, stoploss_from_open
 from technical import qtpylib
 
 
@@ -102,3 +102,26 @@ class MigratedV3(IStrategy):
                            rate: float, time_in_force: str, exit_reason: str,
                            current_time: datetime, **kwargs) -> bool:
         return True
+
+    def confirm_trade_entry(self, pair: str, order_type: str, amount: float, rate: float,
+                            time_in_force: str, current_time: datetime, entry_tag: str | None,
+                            side: str, **kwargs) -> bool:
+        return True
+
+    def custom_entry_price(self, pair: str, trade: Trade | None, current_time: datetime,
+                           proposed_rate: float, entry_tag: str | None, side: str,
+                           **kwargs) -> float:
+        return proposed_rate
+
+    def custom_stoploss(self, pair: str, trade: Trade, current_time: datetime,
+                        current_rate: float, current_profit: float, after_fill: bool,
+                        **kwargs) -> float | None:
+        # Same branches as LegacyV2; they do not fire with this ROI, the point is the syntax.
+        if trade.nr_of_successful_entries > 1 or trade.exit_reason is not None:
+            return 1
+        if current_profit > 0.10:
+            return stoploss_from_open(0.07, current_profit, is_short=trade.is_short)
+        if current_profit > 0.05:
+            return stoploss_from_absolute(current_rate * 0.95, current_rate,
+                                          is_short=trade.is_short, leverage=trade.leverage)
+        return 1

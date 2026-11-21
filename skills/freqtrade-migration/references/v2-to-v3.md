@@ -144,11 +144,39 @@ Observed: with the old keys the 2026.10 spot backtest only logs `DEPRECATED` war
         return True
 ```
 
+Entry callbacks, stoploss helpers and trade attributes, tested (MigratedV3.py lines 106-127; the old forms are in LegacyV2.py, the branches do not fire with this ROI, they test the syntax):
+
+<!-- tested: tests/strategies/MigratedV3.py lines 106-127 -->
+```python
+    def confirm_trade_entry(self, pair: str, order_type: str, amount: float, rate: float,
+                            time_in_force: str, current_time: datetime, entry_tag: str | None,
+                            side: str, **kwargs) -> bool:
+        return True
+
+    def custom_entry_price(self, pair: str, trade: Trade | None, current_time: datetime,
+                           proposed_rate: float, entry_tag: str | None, side: str,
+                           **kwargs) -> float:
+        return proposed_rate
+
+    def custom_stoploss(self, pair: str, trade: Trade, current_time: datetime,
+                        current_rate: float, current_profit: float, after_fill: bool,
+                        **kwargs) -> float | None:
+        # Same branches as LegacyV2; they do not fire with this ROI, the point is the syntax.
+        if trade.nr_of_successful_entries > 1 or trade.exit_reason is not None:
+            return 1
+        if current_profit > 0.10:
+            return stoploss_from_open(0.07, current_profit, is_short=trade.is_short)
+        if current_profit > 0.05:
+            return stoploss_from_absolute(current_rate * 0.95, current_rate,
+                                          is_short=trade.is_short, leverage=trade.leverage)
+        return 1
+```
+
 Imports for these signatures (MigratedV3.py line 9): `from freqtrade.persistence import Order, Trade`.
 
 ## Terminology, pricing and notification settings (docs)
 
-Exit reason strings changed. Update any `exit_reason` / `trade.exit_reason` comparison and any report filter that used the old strings: `sell_signal` to `exit_signal`, `custom_sell` to `custom_exit`, `force_sell` to `force_exit`, `emergency_sell` to `emergency_exit`. Observed in 2026.10 persistence migration code: old `custom_sell` rows in the database are rewritten to `custom_exit`.
+Exit reason strings changed. Update any `exit_reason` / `trade.exit_reason` comparison and any report filter that used the old strings: `sell_signal` to `exit_signal`, `custom_sell` to `custom_exit`, `force_sell` to `force_exit`, `emergency_sell` to `emergency_exit`. Source-read (2026.10 persistence migration code, not run here): old `custom_sell` rows in the database are rewritten to `custom_exit`.
 
 Config (docs):
 
