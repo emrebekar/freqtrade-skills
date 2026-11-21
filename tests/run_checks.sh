@@ -5,9 +5,9 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-[ $# -ge 1 ] || { echo "usage: $0 <Strategy> [--config FILE] [--strategy-path DIR] [--image IMG] [--freqai]" >&2; exit 2; }
+[ $# -ge 1 ] || { echo "usage: $0 <Strategy> [--config FILE] [--strategy-path DIR] [--image IMG] [--freqai] [--freqaimodel NAME]" >&2; exit 2; }
 STRATEGY="$1"; shift
-CONFIG="tests/config.test.json"; SPATH="tests/strategies"; IMAGE="freqtradeorg/freqtrade:2026.10"; FREQAI=""
+MODEL=""; CONFIG="tests/config.test.json"; SPATH="tests/strategies"; IMAGE="freqtradeorg/freqtrade:2026.10"; FREQAI=""
 # freqtrade ignores the config's "datadir" key, so pass it on the CLI.
 DATADIR="tests/data/binance"; TIMERANGE="20260801-20261001"
 while [ $# -gt 0 ]; do
@@ -16,6 +16,7 @@ while [ $# -gt 0 ]; do
     --strategy-path) SPATH="$2"; shift 2 ;;
     --image) IMAGE="$2"; shift 2 ;;
     --freqai) FREQAI="--freqai"; shift ;;
+    --freqaimodel) MODEL="$2"; shift 2 ;;
     *) echo "unknown arg: $1" >&2; exit 2 ;;
   esac
 done
@@ -25,15 +26,17 @@ case "$(uname -s)" in
   *) HOST="$(pwd)" ;;
 esac
 OUT="tests/out/$STRATEGY"; USERDIR="$OUT/user_data"
-rm -rf "$OUT"; mkdir -p "$OUT"
-# Same uid as the host user so Linux CI can write tests/out (not needed under Docker Desktop).
-UIDARGS=(); [ "$(uname -s)" = Linux ] && UIDARGS=(--user "$(id -u):$(id -g)")
-run() { docker run --rm "${UIDARGS[@]}" -e COLUMNS=250 -v "$HOST:/repo" -w /repo "$@"; }
+rm -rf "$OUT" || { echo "setup: FAIL (cannot clean $OUT; root-owned from an earlier Linux run?)"; exit 1; }
+mkdir -p "$OUT"
+# Linux CI: root in the container (image user ftuser cannot write a runner-owned tests/out; an arbitrary --user cannot read ftuser's site-packages).
+UIDARGS=(); [ "$(uname -s)" = Linux ] && UIDARGS=(--user 0:0)
+run() { docker run --rm "${UIDARGS[@]}" -e COLUMNS=250 -e PYTHONUSERBASE=/home/ftuser/.local -v "$HOST:/repo" -w /repo "$@"; }
 ft() { run "$IMAGE" "$@"; }
 COMMON=(-c "$CONFIG" --userdir "$USERDIR" -d "$DATADIR" --timerange "$TIMERANGE" --strategy-path "$SPATH" -s "$STRATEGY" --no-color)
+[ -n "$MODEL" ] && COMMON+=(--freqaimodel "$MODEL")
 fail=0
 
-ft create-userdir --userdir "$USERDIR" >"$OUT/create-userdir.log" 2>&1
+ft create-userdir --userdir "$USERDIR" >"$OUT/create-userdir.log" 2>&1 || { echo "setup: FAIL (create-userdir; see $OUT/create-userdir.log)"; exit 1; }
 
 if ft backtesting "${COMMON[@]}" --export none >"$OUT/backtest.log" 2>&1; then
   echo "backtest: OK"

@@ -1,17 +1,27 @@
 #!/usr/bin/env bash
-# Run run_checks.sh for every entry in tests/strategies.json. Exit 1 if any fail.
-# Needs a JSON reader: uses the pinned freqtrade image's python (scripts/dpy.sh).
+# Run run_checks.sh for every entry in tests/strategies.json. Exit 1 if any fail,
+# or if the manifest cannot be read / is empty.
+# Manifest fields: strategy, config, image, freqai (bool); optional strategy_path, freqaimodel.
+# PY / MANIFEST env vars exist so the failure paths can be tested.
 set -uo pipefail
 cd "$(dirname "$0")/.."
+MANIFEST="${MANIFEST:-tests/strategies.json}"
+PY="${PY:-scripts/dpy.sh}"
+
+rows="$("$PY" -c '
+import json, sys
+for e in json.load(open(sys.argv[1])):
+    print("|".join([e["strategy"], e["config"], e["image"], str(bool(e.get("freqai"))),
+                    e.get("strategy_path", "tests/strategies"), e.get("freqaimodel", "")]))
+' "$MANIFEST" | tr -d '\r')" || { echo "run_all: FAIL (could not read manifest $MANIFEST)" >&2; exit 1; }
+[ -n "$rows" ] || { echo "run_all: FAIL (manifest $MANIFEST has no entries)" >&2; exit 1; }
+
 fail=0
-while IFS=$'\t' read -r strategy config image freqai; do
-  args=("$strategy" --config "$config" --image "$image")
+while IFS='|' read -r strategy config image freqai spath model; do
+  args=("$strategy" --config "$config" --image "$image" --strategy-path "$spath")
   [ "$freqai" = "True" ] && args+=(--freqai)
+  [ -n "$model" ] && args+=(--freqaimodel "$model")
   echo "== $strategy"
   bash tests/run_checks.sh "${args[@]}" || fail=1
-done < <(scripts/dpy.sh -c '
-import json
-for e in json.load(open("tests/strategies.json")):
-    print("\t".join([e["strategy"], e["config"], e["image"], str(bool(e.get("freqai")))]))
-' | tr -d '\r')
+done <<< "$rows"
 exit $fail

@@ -43,10 +43,15 @@ def recursive(path):
     if col is None:
         return False, "recursive: FAIL (no startup_candle_count column in table)"
     bad = []
+    seen = 0
     for ln in lines:
         row = _cells(ln)
-        if row == header or len(row) != len(header):
+        if row == header:
             continue
+        if len(row) != len(header):
+            bad.append(f"malformed row {row[0] if row else '?'}")
+            continue
+        seen += 1
         raw = row[col]
         if raw == "-":
             continue
@@ -54,6 +59,8 @@ def recursive(path):
         if not m or abs(float(m.group(1))) > RECURSIVE_MAX_VARIANCE_PCT:
             bad.append(f"{row[0]}={raw}")
     startup = header[col].split()[0]
+    if not seen:
+        return False, "recursive: FAIL (table has no indicator rows)"
     if bad:
         return False, f"recursive: FAIL (startup={startup}, >{RECURSIVE_MAX_VARIANCE_PCT}%: {', '.join(bad)})"
     return True, f"recursive: OK (startup={startup}, all indicators <= {RECURSIVE_MAX_VARIANCE_PCT}%)"
