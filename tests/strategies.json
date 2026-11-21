@@ -1,4 +1,8 @@
 [
   {"strategy": "SampleSmoke", "config": "tests/config.test.json", "image": "freqtradeorg/freqtrade:2026.10", "freqai": false},
-  {"strategy": "SetupTemplate", "config": "tests/config.test.json", "image": "freqtradeorg/freqtrade:2026.10", "freqai": false}
+  {"strategy": "SetupTemplate", "config": "tests/config.test.json", "image": "freqtradeorg/freqtrade:2026.10", "freqai": false},
+  {"strategy": "IndicatorsExample", "config": "tests/config.test.json", "image": "freqtradeorg/freqtrade:2026.10", "freqai": false},
+  {"strategy": "InformativeExample", "config": "tests/config.test.json", "image": "freqtradeorg/freqtrade:2026.10", "freqai": false},
+  {"strategy": "InformativeMergeExample", "config": "tests/config.test.json", "image": "freqtradeorg/freqtrade:2026.10", "freqai": false},
+  {"strategy": "ShortExample", "config": "tests/config.futures.json", "image": "freqtradeorg/freqtrade:2026.10", "freqai": false}
 ]
