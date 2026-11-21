@@ -96,6 +96,9 @@ jobs:
           # Fail for the right reason: backtest ran fine, lookahead check flagged it.
           grep -q '^backtest: OK' negative.log
           grep -q "^lookahead: BIAS" negative.log
+      - name: show logs on failure
+        if: failure()
+        run: find tests/out -name "*.log" | while read -r f; do echo "::group::$f"; tail -n 60 "$f"; echo "::endgroup::"; done
 
   hyperopt:
     runs-on: ubuntu-latest
@@ -103,6 +106,9 @@ jobs:
       - uses: actions/checkout@v7
       - run: docker pull "$IMAGE"
       - run: bash tests/run_hyperopt.sh HyperoptExample
+      - name: show logs on failure
+        if: failure()
+        run: find tests/out -name "*.log" | while read -r f; do echo "::group::$f"; tail -n 60 "$f"; echo "::endgroup::"; done
 
   slow:
     if: github.event_name == 'workflow_dispatch'
