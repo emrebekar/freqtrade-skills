@@ -52,7 +52,7 @@ Docs: if you found a biased strategy online and want the same results without bi
 - It uses backtesting options: do not enable position stacking (distorts the number of checked signals). If you do, make sure `max_open_trades` slots and wallet never run out.
 - It assumes one-pair backtests behave like the full pairlist. Strategies that depend on the pairlist are reported as biased (false positive): for example `leverage()` or `custom_stake_amount()` using `len(self.dp.current_whitelist())`, or `populate_*` ranking against other pairs; this applies to every strategy method.
 - Limit orders with `custom_entry_price()` / `custom_exit_price()` can cause late or delayed entries and false positives. Market orders are forced, so those callbacks are not called. `--allow-limit-orders` skips the override and has "shown to eventually produce false positives".
-- FreqAI: supported, but the `biased_indicators` column falsely flags target indicators defined in `set_freqai_targets()`. These are not biased and can be ignored. Ignore only `&`-prefixed target columns.
+- FreqAI: supported, but the `biased_indicators` column falsely flags target indicators defined in `set_freqai_targets()`. These are not biased and can be ignored. Ignore only those target columns; treating `&`-prefixed columns as the targets is this repo's gloss, the docs only say "target indicators defined in `set_freqai_targets()`".
 - Can also run from freqUI in webserver mode as a background task; only one analysis (lookahead or recursive) runs at a time.
 
 ## Repo evidence (tests/test_lookahead_fixtures.sh)

@@ -136,7 +136,7 @@ freqtrade plot-profit --strategy IndicatorsExample
 Before reporting the strategy as done:
 
 1. The backtest runs without errors and produces trades; exit reasons and tags were looked at.
-2. `lookahead-analysis` reports no bias; FreqAI `set_freqai_targets()` columns are a documented false positive, nothing else is.
+2. `lookahead-analysis` reports no bias. The only blanket exception is FreqAI `set_freqai_targets()` columns. Pairlist-dependent logic and limit orders with `custom_entry_price()` or `custom_exit_price()` can also give documented false positives; each must be explained to the user, never silently ignored.
 3. `recursive-analysis` shows near-zero variance at the declared `startup_candle_count` (the project checks use at most 0.5%; this is a repo choice, the docs give no number); otherwise raise `startup_candle_count`.
 4. Only after 1 to 3, suggest a dry run. Live trading is the user's separate, explicit decision.
 

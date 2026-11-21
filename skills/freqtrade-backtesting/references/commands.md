@@ -75,5 +75,5 @@ All listed strategies must be in the same directory unless `--recursive-strategy
 
 - `docs/advanced-backtesting.md` shows `freqtrade backtesting ... --backtest-filename ...` and says `_signals.pkl` and `_exited.pkl` appear in the results folder. The 2026.10 help marks `--backtest-filename` deprecated for `backtesting`, and the files are inside the result zip (observed). Prefer `--backtest-directory` and let `backtesting-analysis` read the latest result.
 - `docs/plotting.md` examples use `--export-filename user_data/backtest_results/backtest-result.json`; results are zips now. Observed: the plot commands found the latest result without that option.
-- `docs/backtesting.md` prose explaining the TOTAL row quotes `54.774` while the table above it shows `57.157`; the table values are the consistent ones.
+- `docs/backtesting.md` shows two different examples: the prose under "Backtesting report table" quotes `54.774` USDT (5.48%) while the sample table above shows `57.157`. They are separate examples, not a contradiction; do not mix their numbers.
 - Docs say the breakdown option takes day, week, month, year; the help also lists `weekday`.

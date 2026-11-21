@@ -31,7 +31,7 @@ RIGHT: use positive shifts to look back.
 
 ## 2. Whole-dataframe statistics and normalization
 
-`.mean()`, `.min()`, `.max()`, `.std()`, `.sum()`, `.rank()` and similar without a window compute over the whole dataframe, so every row sees future values. Z-scores, min-max scaling and "relative to the average" columns have the same problem.
+`.mean()`, `.min()`, `.max()`, `.std()`, `.sum()` and `.rank()` (the last two are not in the docs list, untested) and similar without a window compute over the whole dataframe, so every row sees future values. Z-scores, min-max scaling and "relative to the average" columns have the same problem.
 
 ```python
 # WRONG, fixture: tests/fixtures/strategies/LookaheadBadMean.py (flagged: vol_mean, enter_long)
@@ -52,7 +52,7 @@ RIGHT: windowed statistics. Each row then uses only its own past (the first wind
 
 ## 3. Absolute row access in populate methods
 
-`.iloc[-1]`, `.iloc[0]`, `.at[...]` or any fixed position inside `populate_*()` returns a different row in backtesting (the whole range) than in dry/live (only the recent candles). For-loops over rows are slow and easily bias results if the index range is not tightly controlled.
+`.iloc[-1]`, `.iloc[0]`, `.at[...]` (not in the docs list, untested) or any fixed position inside `populate_*()` returns a different row in backtesting (the whole range) than in dry/live (only the recent candles). For-loops over rows are slow and easily bias results if the index range is not tightly controlled.
 
 ```python
 # WRONG, fixture: tests/fixtures/strategies/LookaheadBadIloc.py (flagged: rsi_last)

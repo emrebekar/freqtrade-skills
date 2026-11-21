@@ -9,7 +9,7 @@ license: GPL-3.0
 Every other freqtrade skill routes here. A strategy is not "done", and its backtest or hyperopt numbers do not count, until `lookahead-analysis` and `recursive-analysis` pass. Freqtrade version assumed: 2026.10. Users trade real money: be strict, and never overstate what a pass proves.
 
 Rules:
-- Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives (docs: "not biased and can safely be ignored"); nothing else is a false positive by default.
+- Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives (docs: "not biased and can safely be ignored"). That is the only blanket exception. Pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives (see the interpretation table); each must be explained to the user, never silently ignored.
 - A pass is not proof. The docs: both commands are helpers that find the most common problems, and a negative result does not guarantee there are none. They only check what happened in the tested timerange. Say so in the report.
 - Fix the cause, never the check: do not lower the thresholds, shorten the timerange to avoid trades, or remove a flagged signal from the check. Do not change strategy logic just to silence a flag without understanding it.
 - Keep `dry_run: true`. Live trading is the user's separate, explicit decision.
@@ -19,7 +19,7 @@ Rules:
 
 1. Prerequisites: the strategy loads (`freqtrade list-strategies`), data is downloaded for the whole timerange plus startup candles (freqtrade-setup), and a plain backtest runs with trades (freqtrade-backtesting).
 2. Run `lookahead-analysis` (below). Use a timerange long enough to produce many trades.
-3. Read the table (below). If `has_bias` is `Yes`, or the command reports too few trades, go to step 5 or widen the timerange.
+3. Read the table (below). If `has_bias` is `Yes`, go to step 5 (fix). If the command reports too few trades there is no verdict: widen the timerange and re-run.
 4. Run `recursive-analysis` (below) and read the variance table.
 5. Fix with references/fix-catalog.md: entries first, then exits, then indicators. Re-run both checks after every change, because a fix can move signals.
 6. Repeat until both pass on the same strategy file and timerange you will backtest.
@@ -92,7 +92,7 @@ Observed: on `LookaheadBad` the command printed no result table at all (tests/ru
 | `has_bias` Yes, only `biased_indicators` | An indicator column differs on slices | Find that column in `populate_indicators` |
 | biased exits only | Often follows biased entries | Fix entries, re-run |
 | "too few trades caught" | Not enough trades, no verdict | Widen timerange, add pairs, loosen conditions for the test |
-| Flag on `&` columns with FreqAI | Documented false positive in `set_freqai_targets()` | Ignore those columns only |
+| Flag on `&` columns with FreqAI | Documented false positive in `set_freqai_targets()` | Ignore those columns only (repo gloss: they are the `&`-prefixed targets) |
 | Flag only with `len(self.dp.current_whitelist())` or pair ranking | Verification runs one pair alone: false positive per docs | Do not depend on the pairlist in strategy methods, or explain it |
 | Flag with limit orders and `custom_entry_price()` | Docs: can cause late entries and false positives | Check with the default market orders |
 | Recursive variance above your limit at the strategy's column | Too few startup candles | Raise `startup_candle_count` |
