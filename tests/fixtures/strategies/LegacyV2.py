@@ -113,7 +113,7 @@ class LegacyV2(IStrategy):
 
     def custom_stoploss(self, pair: str, trade: Trade, current_time: datetime,
                         current_rate: float, current_profit: float, **kwargs) -> float:
-        # Branches that old code commonly has; they do not fire with this ROI, the point is the syntax.
+        # custom_stoploss is not enabled (use_custom_stoploss unset): syntax and updater-conversion only, never executed.
         if trade.nr_of_successful_buys > 1 or trade.sell_reason is not None:
             return 1
         if current_profit > 0.10:

@@ -4,7 +4,7 @@ Source: docs/strategy-customization.md (INTERFACE_VERSION paragraph)
 
 # V2 to V3 rename table
 
-Labels: `docs` = from the Freqtrade docs 2026.10 (strategy_migration.md); `observed` = seen in this repo's runs on the 2026.10 image (tests/test_migration_fixtures.sh, tests/out/migration/); `tested` = code byte-identical to tests/strategies/MigratedV3.py, which passes backtesting, `lookahead-analysis` and `recursive-analysis`. MigratedV3 is the hand migration of tests/fixtures/strategies/LegacyV2.py. Both are teaching examples, not profitable strategies.
+Labels: `docs` = from the Freqtrade docs 2026.10 (strategy_migration.md); `observed` = seen in this repo's runs on the 2026.10 image (tests/test_migration_fixtures.sh, tests/out/migration/); `tested` = code byte-identical to tests/strategies/MigratedV3.py, which passes backtesting, `lookahead-analysis` and `recursive-analysis`. Caveat: `custom_stoploss` in MigratedV3 is not enabled (`use_custom_stoploss` unset): import/syntax and updater-conversion only, never executed; `confirm_trade_entry` / `custom_entry_price` run as pass-throughs. MigratedV3 is the hand migration of tests/fixtures/strategies/LegacyV2.py. Both are teaching examples, not profitable strategies.
 
 Interface version: docs say `INTERFACE_VERSION` should be 3 and that 3 is also the default when it is not set. Set it explicitly to 3 after migrating. A strategy that still says 2 "will need to be updated to v3 terminology as future versions will require this to be set" (docs, strategy-customization.md).
 
@@ -144,7 +144,7 @@ Observed: with the old keys the 2026.10 spot backtest only logs `DEPRECATED` war
         return True
 ```
 
-Entry callbacks, stoploss helpers and trade attributes, tested (MigratedV3.py lines 106-127; the old forms are in LegacyV2.py, the branches do not fire with this ROI, they test the syntax):
+Entry callbacks, stoploss helpers and trade attributes, tested (MigratedV3.py lines 106-127; the old forms are in LegacyV2.py, `custom_stoploss` is not enabled (`use_custom_stoploss` unset), so it is import, syntax and updater-conversion only, never executed; `confirm_trade_entry` and `custom_entry_price` run as pass-throughs):
 
 <!-- tested: tests/strategies/MigratedV3.py lines 106-127 -->
 ```python
@@ -161,7 +161,7 @@ Entry callbacks, stoploss helpers and trade attributes, tested (MigratedV3.py li
     def custom_stoploss(self, pair: str, trade: Trade, current_time: datetime,
                         current_rate: float, current_profit: float, after_fill: bool,
                         **kwargs) -> float | None:
-        # Same branches as LegacyV2; they do not fire with this ROI, the point is the syntax.
+        # custom_stoploss is not enabled (use_custom_stoploss unset): syntax and updater-conversion only, never executed.
         if trade.nr_of_successful_entries > 1 or trade.exit_reason is not None:
             return 1
         if current_profit > 0.10:
