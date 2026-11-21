@@ -12,6 +12,7 @@ import sys
 # strategy's own startup_candle_count column.
 RECURSIVE_MAX_VARIANCE_PCT = 0.5
 STRATEGY_COL = "(from strategy)"
+NO_VARIANCE_MSG = "No variance on indicator(s) found due to recursive formula."
 # --freqai: besides the docs-named set_freqai_targets() columns (&-prefixed), lookahead-analysis flags FreqAI outputs and the
 # signal columns built from them. Observed on 2026.10: do_predict, enter_long, exit_long, enter_tag, exit_tag.
 # enter_short, exit_short, DI_values are symmetric but unobserved. Ignored ONLY when at least one & column is also
@@ -41,8 +42,11 @@ def _cells(line):
 
 def recursive(path, freqai=False):
     with open(path, encoding="utf-8") as fh:
-        lines = [ln for ln in fh if ln.strip().startswith(("┃", "│"))]
+        text = fh.read()
+    lines = [ln for ln in text.splitlines() if ln.strip().startswith(("┃", "│"))]
     header = next((_cells(ln) for ln in lines if "Indicators" in ln), None)
+    if not header and NO_VARIANCE_MSG in text:  # freqtrade prints no table when every indicator matches
+        return True, "recursive: OK (no variance on any indicator)"
     if not header:
         return False, "recursive: FAIL (no result table found)"
     col = next((i for i, h in enumerate(header) if STRATEGY_COL in h), None)

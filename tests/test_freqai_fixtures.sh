@@ -40,6 +40,12 @@ S.py,S,True,20,0,0,"do_predict,enter_long,exit_long"
 msg=$(run --entrypoint python "$IMAGE" -I tests/check_results.py lookahead "$OUT/derived_only.csv" --freqai); rc=$?
 if [ $rc -ne 0 ]; then echo "synthetic derived_only: OK as expected (fail) - $msg"; else echo "synthetic derived_only: FAIL (expected fail) - $msg"; fail=1; fi
 rt targets_without_flag fail "" "&-s_close -111.5% -59.6%"
+for spec in "no_variance:pass:INFO - No variance on indicator(s) found due to recursive formula." "no_table:fail:INFO - Start checking for recursive bias"; do
+  n="${spec%%:*}"; rest="${spec#*:}"; want="${rest%%:*}"; printf '%s\n' "${rest#*:}" > "$OUT/rec-$n.log"
+  msg=$(run --entrypoint python "$IMAGE" -I tests/check_results.py recursive "$OUT/rec-$n.log" --freqai); rc=$?
+  if { [ "$want" = pass ] && [ $rc -eq 0 ]; } || { [ "$want" = fail ] && [ $rc -ne 0 ]; }; then echo "synthetic recursive $n: OK as expected ($want) - $msg"
+  else echo "synthetic recursive $n: FAIL (expected $want) - $msg"; fail=1; fi
+done
 
 [ "${SKIP_RUNS:-0}" = 1 ] && exit $fail
 run "$IMAGE" create-userdir --userdir "$USERDIR" >"$OUT/create-userdir.log" 2>&1 || { echo "setup: FAIL"; exit 1; }
