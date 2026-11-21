@@ -45,7 +45,13 @@ Group 2:
 | `--entry-only`, `--exit-only` | Show indicators for one side only (no suffixes). |
 | `--timerange` | Filter output trades (start inclusive, end exclusive). |
 | `--rejected-signals` | Print rejected signals. |
-| `--analysis-to-csv`, `--analysis-csv-path PATH` | Write tables to CSV (per docs: `group_0.csv`, `group_1.csv`, `rejected_signals.csv`; default folder is the results directory, though the 2026.10 help text says `user_data/basktesting_results/`) instead of printing. |
+| `--analysis-to-csv`, `--analysis-csv-path PATH` | Write tables to CSV (per docs: `group_0.csv`, `group_1.csv`, `rejected_signals.csv`; docs and help text give the default as `user_data/basktesting_results/` (typo upstream); the actual location was not tested here, so pass `--analysis-csv-path` explicitly) instead of printing. |
+
+Example writing CSVs to an explicit folder (do not rely on the default):
+
+```bash
+freqtrade backtesting-analysis --analysis-groups 0 1 --analysis-to-csv --analysis-csv-path tests/out/analysis/
+```
 
 Extra fields usable in `--indicator-list`: `open_date`, `close_date`, `min_rate`, `max_rate`, `open`, `close`, `high`, `low`, `volume`, `profit_ratio`, `profit_abs`; trade-wide fields have no suffix (`pair`, `stake_amount`, `open_rate`, `close_rate`, `trade_duration`, `exit_reason`, `enter_tag`, `leverage`, `is_short`, `orders`, and others listed in the docs).
 

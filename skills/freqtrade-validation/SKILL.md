@@ -102,7 +102,7 @@ Observed: on `LookaheadBad` the command printed no result table at all (tests/ru
 
 Before reporting the strategy as done, show the user the actual outputs of:
 
-1. `lookahead-analysis`: `has_bias` No, no biased signals or indicators (except documented FreqAI targets), enough trades verified.
+1. `lookahead-analysis`: `has_bias` No, no biased signals or indicators (the only blanket exception is FreqAI `set_freqai_targets()` columns; pairlist-dependent logic and limit orders with `custom_*_price` can also give documented false positives, each explained, never silently ignored), enough trades verified.
 2. `recursive-analysis`: low variance for every indicator at the declared `startup_candle_count`.
 3. A re-run of both after the last code change.
 4. The honest limits: only signals that fired were checked; helpers do not prove a strategy is clean.

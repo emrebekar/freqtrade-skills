@@ -118,7 +118,7 @@ Backtest of 2026-08-01 to 2026-10-01, BTC/USDT and ETH/USDT, 5m, from the export
 Before reporting the strategy as done:
 
 1. The strategy loads (`freqtrade list-strategies`) and backtests without errors and with trades; the callback actually fired (see step 4 of the workflow).
-2. `lookahead-analysis` reports no bias (`has_bias` False, no biased entry/exit signals or indicators). FreqAI `set_freqai_targets()` columns are a documented false positive; nothing else is.
+2. `lookahead-analysis` reports no bias (`has_bias` False, no biased entry/exit signals or indicators). The only blanket exception is FreqAI `set_freqai_targets()` columns. Pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each to the user, never silently ignore.
 3. `recursive-analysis` shows near-zero variance (the project checks use at most 0.5% at the declared `startup_candle_count`); otherwise raise `startup_candle_count`, not the tolerance.
 4. Only after 1 to 3, suggest a dry run. Live trading is the user's separate, explicit decision.
 
