@@ -1,0 +1,106 @@
+name: test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  IMAGE: freqtradeorg/freqtrade:2026.10
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker pull "$IMAGE"
+      - name: validate_skills
+        run: scripts/dpy.sh scripts/validate_skills.py
+      - name: check_cli
+        run: scripts/dpy.sh scripts/check_cli.py
+      - name: validator self-tests
+        run: bash tests/test_validate_skills.sh
+      - name: check_cli self-tests
+        run: bash tests/test_check_cli.sh
+
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      include: ${{ steps.gen.outputs.include }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: gen
+        name: Build matrix from tests/strategies.json
+        shell: python
+        run: |
+          import json, os
+          rows = []
+          for e in json.load(open("tests/strategies.json")):
+              args = ["--config", e["config"], "--image", e["image"],
+                      "--strategy-path", e.get("strategy_path", "tests/strategies")]
+              if e.get("freqai"):
+                  args.append("--freqai")
+              if e.get("freqaimodel"):
+                  args += ["--freqaimodel", e["freqaimodel"]]
+              rows.append({"strategy": e["strategy"], "image": e["image"], "args": " ".join(args)})
+          assert rows, "tests/strategies.json is empty"
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write("include=" + json.dumps(rows) + "\n")
+
+  strategies:
+    needs: matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.matrix.outputs.include) }}
+    name: strategy ${{ matrix.strategy }}
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker pull "$MATRIX_IMAGE"
+        env:
+          MATRIX_IMAGE: ${{ matrix.image }}
+      - name: run_checks
+        env:
+          STRATEGY: ${{ matrix.strategy }}
+          ARGS: ${{ matrix.args }}
+        # ARGS is unquoted on purpose: it holds space-separated flags from the repo's own manifest.
+        run: |
+          # shellcheck disable=SC2086
+          bash tests/run_checks.sh "$STRATEGY" $ARGS
+
+  negative:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker pull "$IMAGE"
+      - name: LookaheadBad must fail the lookahead check
+        run: |
+          rc=0
+          bash tests/run_checks.sh LookaheadBad --strategy-path tests/fixtures/strategies >negative.log 2>&1 || rc=$?
+          cat negative.log
+          [ "$rc" -ne 0 ] || { echo "LookaheadBad passed run_checks, the harness is blind"; exit 1; }
+          # Fail for the right reason: backtest ran fine, lookahead check flagged it.
+          grep -q '^backtest: OK' negative.log
+          grep -q "^lookahead: BIAS" negative.log
+
+  hyperopt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker pull "$IMAGE"
+      - run: bash tests/run_hyperopt.sh HyperoptExample
+
+  slow:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker pull "$IMAGE" && docker pull "${IMAGE}_freqai"
+      - run: bash tests/test_lookahead_fixtures.sh
+      - run: bash tests/test_migration_fixtures.sh
+      - run: bash tests/test_freqai_fixtures.sh

@@ -2,6 +2,8 @@
 
 Cross-harness Agent Skills (SKILL.md format) for developing Freqtrade strategies.
 
+If your harness has no native skill support: when a task matches a row below, read the listed `skills/<name>/SKILL.md` in full and follow it, opening files in that skill's `references/` folder when the skill points to them. Do not call a strategy finished, or suggest dry-run or live trading, until the freqtrade-validation gate (lookahead-analysis and recursive-analysis) has passed.
+
 | Skill | Path |
 |-------|------|
 | freqtrade-setup | skills/freqtrade-setup/SKILL.md - install Freqtrade (Docker/native), create user dir and config, generate strategy, download and list data |
