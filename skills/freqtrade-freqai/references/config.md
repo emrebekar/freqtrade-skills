@@ -15,7 +15,7 @@ The docs mark `freqai`, `train_period_days`, `backtest_period_days` and `identif
 
 ## Tested config (repo)
 
-This block is the `freqai` object of tests/config.freqai.json, used with `LightGBMRegressor` on `BTC/USDT` (pair whitelist of one) with `ETH/USDT` as a correlated pair, 5m plus 1h. It is deliberately small so CI stays fast, not a recommendation.
+This block is the `freqai` object of [tests/config.freqai.json](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/config.freqai.json), used with `LightGBMRegressor` on `BTC/USDT` (pair whitelist of one) with `ETH/USDT` as a correlated pair, 5m plus 1h. It is deliberately small so CI stays fast, not a recommendation.
 
 <!-- tested: tests/config.freqai.json lines 21-38 -->
 ```json

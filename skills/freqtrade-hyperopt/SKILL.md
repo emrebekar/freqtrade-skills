@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade hyperopt
 
-Hyperopt runs the backtester many times with different parameter values and keeps the combination that minimizes a loss function. Freqtrade version assumed: 2026.10. It needs the same historical data as backtesting. Users trade real money: hyperopt is the step where overfitting happens, so say plainly what its output does and does not prove. The example `HyperoptExample` (tests/strategies/) and the custom loss (tests/hyperopt_losses/) were run on the repo's test data (BTC/USDT and ETH/USDT, 5m, 2026-08-01 to 2026-10-01). They are teaching examples, not profitable strategies; never present their numbers as a result.
+Hyperopt runs the backtester many times with different parameter values and keeps the combination that minimizes a loss function. Freqtrade version assumed: 2026.10. It needs the same historical data as backtesting. Users trade real money: hyperopt is the step where overfitting happens, so say plainly what its output does and does not prove. The example `HyperoptExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) and the custom loss ([tests/hyperopt_losses/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/hyperopt_losses/)) were run on the repo's test data (BTC/USDT and ETH/USDT, 5m, 2026-08-01 to 2026-10-01). They are teaching examples, not profitable strategies; never present their numbers as a result.
 
 Rules:
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives. That is the only blanket exception: pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each, never silently ignore. A pass does not prove the strategy is clean (see freqtrade-validation).
@@ -43,7 +43,7 @@ freqtrade hyperopt-show --best -n -1
 - `--disable-param-export`: do not write the params JSON file.
 - Results go to `<userdir>/hyperopt_results/*.fthypt`; `hyperopt-list` and `hyperopt-show` read the latest, or `--hyperopt-filename NAME`.
 
-In this repo: `tests/run_hyperopt.sh HyperoptExample` runs a 5-epoch smoke test on a temp copy under tests/out/hyperopt/ (never writes into tests/strategies/), then `hyperopt-list` and `hyperopt-show`.
+In the freqtrade-skills repository (/tests): `tests/run_hyperopt.sh HyperoptExample` runs a 5-epoch smoke test on a temp copy under tests/out/hyperopt/ (never writes into [tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)), then `hyperopt-list` and `hyperopt-show`.
 
 ## Parameters at a glance
 

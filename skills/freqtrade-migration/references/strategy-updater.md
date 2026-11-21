@@ -3,7 +3,7 @@ Source: docs/strategy_migration.md
 
 # strategy-updater
 
-`freqtrade strategy-updater` rewrites strategy files to the v3 interface automatically. The docs page is only the `--help` output; the behavior below is `observed` on the 2026.10 image (tests/test_migration_fixtures.sh and the scratch runs under tests/out/updater*, plus reading the shipped `freqtrade/strategy/strategyupdater.py`). Treat the updater as a first pass to diff and fix by hand, never as the migration.
+`freqtrade strategy-updater` rewrites strategy files to the v3 interface automatically. The docs page is only the `--help` output; the behavior below is `observed` on the 2026.10 image ([tests/test_migration_fixtures.sh](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/test_migration_fixtures.sh) and the scratch runs under tests/out/updater*, plus reading the shipped `freqtrade/strategy/strategyupdater.py`). Treat the updater as a first pass to diff and fix by hand, never as the migration.
 
 ## Usage
 
@@ -22,7 +22,7 @@ Observed behavior:
 
 ## What it converts (observed)
 
-Run on tests/fixtures/strategies/LegacyV2.py (the test script uses a copy under tests/out/migration/updated/). `trade.nr_of_successful_buys` to `trade.nr_of_successful_entries` is asserted by the script too.
+Run on [tests/fixtures/strategies/LegacyV2.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/fixtures/strategies/LegacyV2.py) (the test script uses a copy under tests/out/migration/updated/). `trade.nr_of_successful_buys` to `trade.nr_of_successful_entries` is asserted by the script too.
 
 - Adds `INTERFACE_VERSION = 3` as the first class member (or sets an existing value to 3). Only for classes whose base is literally `IStrategy`.
 - Method names: `populate_buy_trend`, `populate_sell_trend`, `custom_sell`, `check_buy_timeout`, `check_sell_timeout`.
@@ -34,11 +34,11 @@ Run on tests/fixtures/strategies/LegacyV2.py (the test script uses a copy under 
 - `space="buy"` / `space="sell"` in hyperopt parameters are intentionally left alone (the updater skips `space=` keywords).
 - A `numpy` `NaN` / `NAN` to `nan` replacement (NumPy 2).
 
-The converted LegacyV2 backtested with identical trades to the original and to the hand-migrated tests/strategies/MigratedV3.py (200 trades each, same pairs, dates, rates, profits and exit reasons).
+The converted LegacyV2 backtested with identical trades to the original and to the hand-migrated [tests/strategies/MigratedV3.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/MigratedV3.py) (200 trades each, same pairs, dates, rates, profits and exit reasons).
 
 ## What it does NOT convert (observed)
 
-Items 1 to 4 are reproducible from the repo: the fixture tests/fixtures/strategies/LegacyV2.py contains each pattern and `tests/test_migration_fixtures.sh` asserts the gap on the converted copy. Items 5 and 6 come from reading the updater source, not from a run. Also grep yourself for exit reason strings such as `sell_signal`, `custom_sell`, `force_sell`, `emergency_sell` in comparisons.
+Items 1 to 4 are reproducible from the repo: the fixture [tests/fixtures/strategies/LegacyV2.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/fixtures/strategies/LegacyV2.py) contains each pattern and [`tests/test_migration_fixtures.sh`](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/test_migration_fixtures.sh) asserts the gap on the converted copy. Items 5 and 6 come from reading the updater source, not from a run. Also grep yourself for exit reason strings such as `sell_signal`, `custom_sell`, `force_sell`, `emergency_sell` in comparisons.
 
 1. `order_types` keys `emergencysell`, `forcesell`, `forcebuy` stay unchanged (`emergency_exit`, `force_exit`, `force_entry` are the new names). Freqtrade still logs a `DEPRECATED` warning for them.
 2. No `side` argument is added to `custom_stake_amount`, `confirm_trade_entry` or `custom_entry_price`, and `custom_entry_price` does not get the `trade` argument. Old signatures keep working only because of `**kwargs`; futures and shorts need `side`.

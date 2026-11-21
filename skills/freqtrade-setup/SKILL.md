@@ -10,7 +10,7 @@ Get from nothing to a working user directory, a dry-run config, a strategy file 
 
 Rules for every step below:
 - Start with `dry_run: true`. Never put exchange API keys in a config you commit or share (see the freqtrade-config skill).
-- Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass on it. Exception: FreqAI strategies may show false positives for columns set in `set_freqai_targets()`; those targets are expected to look ahead.
+- Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass on it. The only blanket exception is FreqAI `set_freqai_targets()` columns (targets are expected to look ahead). Pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each to the user, never silently ignore.
 - Backtests need data: download it first (below) and include the strategy's `startup_candle_count` extra candles before the timerange start.
 
 ## 1. Install

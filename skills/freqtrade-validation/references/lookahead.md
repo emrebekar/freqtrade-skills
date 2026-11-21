@@ -40,7 +40,7 @@ Real output, trimmed (fixture `LookaheadBad`: `rsi = ta.RSI(...).shift(-1)`):
 │ LookaheadBad.py │ LookaheadBad │      Yes │            20 │                    0 │                   0 │ rsi, enter_long, exit_long │
 ```
 
-Note: `has_bias` was `Yes` although both signal counts were 0; the indicators column carried the finding. Repo rule (`tests/check_results.py`): biased if either signal count is above 0 or `has_bias` is `True` in the CSV.
+Note: `has_bias` was `Yes` although both signal counts were 0; the indicators column carried the finding. Repo rule ([`tests/check_results.py`](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/check_results.py)): biased if either signal count is above 0 or `has_bias` is `True` in the CSV.
 
 ## Salvaging a biased strategy
 
@@ -55,9 +55,9 @@ Docs: if you found a biased strategy online and want the same results without bi
 - FreqAI: supported, but the `biased_indicators` column falsely flags target indicators defined in `set_freqai_targets()`. These are not biased and can be ignored. Ignore only those target columns; treating `&`-prefixed columns as the targets is this repo's gloss, the docs only say "target indicators defined in `set_freqai_targets()`".
 - Can also run from freqUI in webserver mode as a background task; only one analysis (lookahead or recursive) runs at a time.
 
-## Repo evidence (tests/test_lookahead_fixtures.sh)
+## Repo evidence ([tests/test_lookahead_fixtures.sh](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/test_lookahead_fixtures.sh))
 
-Fixtures in tests/fixtures/strategies/ and the expected results: see the table in SKILL.md. The two false negatives (plain merge, MACD signal period 1) are documented as such: the check is a helper, not a proof. `LookaheadBad` must keep failing in `tests/run_checks.sh`.
+Fixtures in [tests/fixtures/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/fixtures/strategies/) and the expected results: see the table in SKILL.md. The two false negatives (plain merge, MACD signal period 1) are documented as such: the check is a helper, not a proof. `LookaheadBad` must keep failing in [`tests/run_checks.sh`](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/run_checks.sh).
 
 ## Docs inconsistency
 

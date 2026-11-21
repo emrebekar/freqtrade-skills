@@ -90,7 +90,7 @@ Used in the signal methods (guards are combined with a trigger-like zscore condi
 
 Imports needed (same file): `from functools import reduce`, `from freqtrade.strategy import BooleanParameter, DecimalParameter, IntParameter, IStrategy`.
 
-In the test, a plain backtest of this file (no JSON present) logged "Strategy Parameter(default): ..." for each parameter, and `lookahead-analysis` and `recursive-analysis` passed (`tests/run_checks.sh HyperoptExample`).
+In the test, a plain backtest of this file (no JSON present) logged "Strategy Parameter(default): ..." for each parameter, and `lookahead-analysis` and `recursive-analysis` passed (`tests/run_checks.sh HyperoptExample` in the freqtrade-skills repository, /tests).
 
 ## Parameters inside indicators (do not do this naively)
 

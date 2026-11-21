@@ -38,16 +38,16 @@ Trade counts: `--targeted-trade-amount` is how many signals are verified (the do
 
 Columns: `has_bias` (`No` is good, `Yes` is bad), `total_signals`, `biased_entry_signals`, `biased_exit_signals`, `biased_indicators` (columns from `populate_indicators`, observed to include `enter_long` / `exit_long` when signals are biased). Fix entries first; biased exits may be a consequence of biased entries (docs). A bias can show only in `biased_indicators` with 0 biased signals.
 
-Real output on a known-bad fixture, trimmed (tests/fixtures/strategies/LookaheadBad.py: `ta.RSI(...).shift(-1)`, test data, 2026-08-01 to 2026-10-01):
+Real output on a known-bad fixture, trimmed ([tests/fixtures/strategies/LookaheadBad.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/fixtures/strategies/LookaheadBad.py): `ta.RSI(...).shift(-1)`, test data, 2026-08-01 to 2026-10-01):
 
 ```text
 ┃        filename ┃     strategy ┃ has_bias ┃ total_signals ┃ biased_entry_signals ┃ biased_exit_signals ┃          biased_indicators ┃
 │ LookaheadBad.py │ LookaheadBad │      Yes │            20 │                    0 │                   0 │ rsi, enter_long, exit_long │
 ```
 
-The log line behind it: `found look ahead bias in column rsi. 29.66475411745386 != nan`. A clean strategy (tests/strategies/ValidationExample.py) printed `has_bias No`, `total_signals 13`, nothing in the other columns.
+The log line behind it: `found look ahead bias in column rsi. 29.66475411745386 != nan`. A clean strategy ([tests/strategies/ValidationExample.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/ValidationExample.py)) printed `has_bias No`, `total_signals 13`, nothing in the other columns.
 
-What the checks catch and miss (repo tests, test data; run `tests/test_lookahead_fixtures.sh`):
+What the checks catch and miss (repo tests, test data; run [`tests/test_lookahead_fixtures.sh`](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/test_lookahead_fixtures.sh)):
 
 | Pattern (fixture) | `lookahead-analysis` result |
 |-------------------|-----------------------------|
@@ -70,7 +70,7 @@ freqtrade recursive-analysis --strategy MyStrategy --timerange 20260801-20261001
 
 It calculates indicators (not trades) on data of different lengths and compares the last row's values with a benchmark from the full range. Recursive indicators (EMA, RSI, ATR, anything that uses previous values) depend on how many candles you feed them, so live (limited by the exchange) can differ from backtesting. Use one pair with a high price and moderate volatility (BTC or ETH) and a long timerange (docs: at least 5000 candles; 18 days on 5m). It also runs a simple lookahead check on indicator values. It only calculates `populate_indicators` and `@informative` methods: an indicator computed in `populate_entry_trend` or `populate_exit_trend` is not checked.
 
-Real output, trimmed (tests/strategies/IndicatorsExample.py, `startup_candle_count = 200`, test data):
+Real output, trimmed ([tests/strategies/IndicatorsExample.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/IndicatorsExample.py), `startup_candle_count = 200`, test data):
 
 ```text
 ┃     Indicators ┃      30 ┃     100 ┃ 200 (from strategy) ┃     499 ┃
@@ -82,7 +82,7 @@ Real output, trimmed (tests/strategies/IndicatorsExample.py, `startup_candle_cou
 
 Reading it: columns are `startup_candle_count` values (the strategy's own is marked `(from strategy)`; without `--startup-candle` the run used 199, 399, the strategy's value, 499, 999 and 1999 in our test). Cells are the variance of the indicator versus the benchmark. `-` is zero variance, `nan%` means too few candles to calculate (here `ema_slow` with 30 candles). Judge each indicator at your strategy's column: the variance must be small enough that it cannot change entries or exits. The docs give no numeric limit and say zero is not always the best option (some indicators would need a very long startup). This repo's checks fail above 0.5% at the strategy's own column: that is a repo choice, not a Freqtrade rule. If the strategy's column is too high, raise `startup_candle_count` and re-run (not the tolerance). The docs say the default values are odd numbers on purpose and that on Binance the largest usable `startup_candle_count` is 4999 (5 calls of 1000 candles); more candles also mean more startup time and API calls (we saw a warning at 1999).
 
-Observed: on `LookaheadBad` the command printed no result table at all (tests/run_checks.sh reports "no result table found"). Fix lookahead bias first, then re-run recursive-analysis. Details: references/recursive.md.
+Observed: on `LookaheadBad` the command printed no result table at all ([tests/run_checks.sh](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/run_checks.sh) reports "no result table found"). Fix lookahead bias first, then re-run recursive-analysis. Details: references/recursive.md.
 
 ## Interpreting and deciding
 
@@ -103,7 +103,7 @@ Observed: on `LookaheadBad` the command printed no result table at all (tests/ru
 Before reporting the strategy as done, show the user the actual outputs of:
 
 1. `lookahead-analysis`: `has_bias` No, no biased signals or indicators (the only blanket docs exception is FreqAI `set_freqai_targets()` columns; for FreqAI the repo also accepts FreqAI's own outputs, exact list in freqtrade-freqai, only when an `&` column is flagged and biased entry/exit signals are 0; pairlist-dependent logic and limit orders with `custom_*_price` can also give documented false positives, each explained, never silently ignored), enough trades verified.
-2. `recursive-analysis`: low variance for every indicator at the declared `startup_candle_count`.
+2. `recursive-analysis`: low variance for every indicator at the declared `startup_candle_count`. For FreqAI strategies recursive-analysis lists only model outputs and does not assess `%` features (the repo harness prints `NOT ASSESSED`); that is not a pass, see the freqtrade-freqai gate.
 3. A re-run of both after the last code change.
 4. The honest limits: only signals that fired were checked; helpers do not prove a strategy is clean.
 

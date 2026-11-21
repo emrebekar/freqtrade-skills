@@ -27,7 +27,7 @@ Naming: a `-period` suffix in a feature name is replaced by `-period_<n>`; FreqA
 
 ## Tested strategy code
 
-The whole strategy is tests/strategies/FreqaiExample.py. Feature functions:
+The whole strategy is [tests/strategies/FreqaiExample.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/FreqaiExample.py). Feature functions:
 
 <!-- tested: tests/strategies/FreqaiExample.py lines 20-40 -->
 ```python
@@ -139,4 +139,4 @@ A custom model can write `dk.data['extra_returns_per_train']['my_new_value'] = X
 
 ## Look-ahead rules for features
 
-Docs: backtesting calls `set_freqai_targets()` once per backtest window, which simulates dry/live without look-ahead, but defines features once over the whole training range, so features must not look ahead. Concretely avoid in `feature_engineering_*()`: `shift(-n)`, `.iloc` positions, statistics over the whole column (`mean()`, `std()` of the full column), resampling or merging informative data without the usual forward-fill shift (freqtrade-validation fix catalog). Observed: a fixture with `%-leak = close.shift(-1) / close` (tests/fixtures/strategies/FreqaiLookaheadBad.py) was not flagged by `lookahead-analysis` at all.
+Docs: backtesting calls `set_freqai_targets()` once per backtest window, which simulates dry/live without look-ahead, but defines features once over the whole training range, so features must not look ahead. Concretely avoid in `feature_engineering_*()`: `shift(-n)`, `.iloc` positions, statistics over the whole column (`mean()`, `std()` of the full column), resampling or merging informative data without the usual forward-fill shift (freqtrade-validation fix catalog). Observed: a fixture with `%-leak = close.shift(-1) / close` ([tests/fixtures/strategies/FreqaiLookaheadBad.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/fixtures/strategies/FreqaiLookaheadBad.py)) was not flagged by `lookahead-analysis` at all.

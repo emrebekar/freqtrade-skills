@@ -30,7 +30,7 @@ Best result:
     }
 ```
 
-(Real output, tests/run_hyperopt.sh, 5 epochs on test data, trimmed.) `buy_rsi_enabled: False` means that guard should not be used (docs). Docs: "consider" using the values, they are a result of one search, not a truth. ROI results print a `minimal_roi = {...}` table, stoploss `stoploss = ...`, trailing the four `trailing_*` values. Values marked `# value loaded from strategy` were not searched.
+(Real output, [tests/run_hyperopt.sh](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/run_hyperopt.sh), 5 epochs on test data, trimmed.) `buy_rsi_enabled: False` means that guard should not be used (docs). Docs: "consider" using the values, they are a result of one search, not a truth. ROI results print a `minimal_roi = {...}` table, stoploss `stoploss = ...`, trailing the four `trailing_*` values. Values marked `# value loaded from strategy` were not searched.
 
 ## Where the optimized values live (docs + observed)
 
@@ -81,7 +81,7 @@ freqtrade hyperopt-show --best -n -1 --print-json --no-header
 │ * Best │   3/5 │     33 │   14     0    19  42.4 │     -0.05% │  -1.619 USDT   (-0.16%) │      4:14:00 │   2.86843 │
 ```
 
-- Observed: freqtrade returned exit code 0 on an argument error (`hyperopt-show -s X`: "unrecognized arguments"), so scripts must also read the output. `tests/run_hyperopt.sh` does.
+- Observed: freqtrade returned exit code 0 on an argument error (`hyperopt-show -s X`: "unrecognized arguments"), so scripts must also read the output. [`tests/run_hyperopt.sh`](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/run_hyperopt.sh) does.
 - `hyperopt-show` prints a normal backtest report for that epoch, useful to see per-pair trades.
 
 ## Validate the optimized strategy (docs)
@@ -121,4 +121,4 @@ Better still (repo advice, untested here): several consecutive windows, and a fi
 
 Optimized parameters count only after the optimized strategy (strategy file plus the parameters actually loaded) passes freqtrade-validation: `lookahead-analysis` and `recursive-analysis`, re-run after the parameters are applied, on the same files you will backtest. Hyperopt can push a parameter into a region where an indicator is biased or recursive-unstable (for example a longer period needs a larger `startup_candle_count`). Raise `startup_candle_count` for the largest period in the search space, not for the default.
 
-Observed: `tests/run_checks.sh HyperoptExample --strategy-path tests/out/hyperopt/strategies` (the optimized copy with its JSON): backtest OK, lookahead OK, recursive OK (startup 400, all indicators <= 0.5%).
+Observed, in the freqtrade-skills repository (/tests): `tests/run_checks.sh HyperoptExample --strategy-path tests/out/hyperopt/strategies` (the optimized copy with its JSON): backtest OK, lookahead OK, recursive OK (startup 400, all indicators <= 0.5%).

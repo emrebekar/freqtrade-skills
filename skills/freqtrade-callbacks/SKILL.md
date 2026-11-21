@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade strategy callbacks
 
-Callbacks are strategy methods the bot calls "whenever needed" (during a trade, or when entering or exiting), unlike `populate_*` which are vectorized. Freqtrade version assumed: 2026.10. The example classes `CallbacksExample` and `PositionAdjustExample` (tests/strategies/) were run through backtesting, `lookahead-analysis` and `recursive-analysis` on test data, and the backtest exports were inspected to confirm each callback fired (see "What the tests showed"). They are teaching examples, not profitable strategies; never present them as such.
+Callbacks are strategy methods the bot calls "whenever needed" (during a trade, or when entering or exiting), unlike `populate_*` which are vectorized. Freqtrade version assumed: 2026.10. The example classes `CallbacksExample` and `PositionAdjustExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) were run through backtesting, `lookahead-analysis` and `recursive-analysis` on test data, and the backtest exports were inspected to confirm each callback fired (see "What the tests showed"). They are teaching examples, not profitable strategies; never present them as such.
 
 Rules:
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives. A pass does not prove the strategy is clean; it only checks signals that fired in the tested timerange.
@@ -47,7 +47,7 @@ If a plain signal, `minimal_roi` or `stoploss` does the job, use those: they are
 
 ## Tested example: all callbacks together
 
-`CallbacksExample` (tests/strategies/CallbacksExample.py) implements `bot_start`, `bot_loop_start`, `custom_stake_amount`, `confirm_trade_entry`, `custom_exit` and `custom_stoploss`. Class attributes:
+`CallbacksExample` ([tests/strategies/CallbacksExample.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/CallbacksExample.py)) implements `bot_start`, `bot_loop_start`, `custom_stake_amount`, `confirm_trade_entry`, `custom_exit` and `custom_stoploss`. Class attributes:
 
 <!-- tested: tests/strategies/CallbacksExample.py lines 15-26 -->
 ```python
@@ -85,7 +85,7 @@ A trailing custom stoploss that uses the open-price helper, and a custom exit wi
         return -0.04 * trade.leverage
 ```
 
-`PositionAdjustExample` (tests/strategies/PositionAdjustExample.py) enables position adjustment, allows one extra entry, and implements one DCA add plus one partial exit:
+`PositionAdjustExample` ([tests/strategies/PositionAdjustExample.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/PositionAdjustExample.py)) enables position adjustment, allows one extra entry, and implements one DCA add plus one partial exit:
 
 <!-- tested: tests/strategies/PositionAdjustExample.py lines 21-26 -->
 ```python
@@ -118,7 +118,7 @@ Backtest of 2026-08-01 to 2026-10-01, BTC/USDT and ETH/USDT, 5m, from the export
 Before reporting the strategy as done:
 
 1. The strategy loads (`freqtrade list-strategies`) and backtests without errors and with trades; the callback actually fired (see step 4 of the workflow).
-2. `lookahead-analysis` reports no bias (`has_bias` False, no biased entry/exit signals or indicators). The only blanket exception is FreqAI `set_freqai_targets()` columns. Pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each to the user, never silently ignore.
+2. `lookahead-analysis` reports no bias (`has_bias` No, no biased entry/exit signals or indicators). The only blanket exception is FreqAI `set_freqai_targets()` columns. Pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each to the user, never silently ignore.
 3. `recursive-analysis` shows near-zero variance (the project checks use at most 0.5% at the declared `startup_candle_count`); otherwise raise `startup_candle_count`, not the tolerance.
 4. Only after 1 to 3, suggest a dry run. Live trading is the user's separate, explicit decision.
 

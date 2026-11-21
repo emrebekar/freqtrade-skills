@@ -22,7 +22,7 @@ Shorting is impossible on `spot`. The config needs futures mode and a margin mod
 
 - `margin_mode`: `isolated` (collateral per pair) or `cross` (shared collateral; higher risk of full-account liquidation, and cross-position influence may not be fully simulated in dry-run or backtesting).
 - Futures pairs are written `base/quote:settle`, e.g. `ETH/USDT:USDT`.
-- Binance futures need `use_order_book: true` in `entry_pricing`/`exit_pricing` (see freqtrade-config). The repo's `tests/config.futures.json` is a working example.
+- Binance futures need `use_order_book: true` in `entry_pricing`/`exit_pricing` (see freqtrade-config). The repo's [`tests/config.futures.json`](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/config.futures.json) is a working example.
 - Futures backtesting needs futures candles plus mark and funding-rate data. If funding rates are unavailable for the timerange you can set `futures_funding_rate` (recommended `0`), which makes backtests less accurate.
 - Download futures data with the setup skill's data commands (`--trading-mode futures`).
 
@@ -34,7 +34,7 @@ Shorting is impossible on `spot`. The config needs futures mode and a margin mod
 
 ## Tested example: ShortExample
 
-Source file: ShortExample. Passes backtesting, `lookahead-analysis` and `recursive-analysis` with `tests/config.futures.json`. A backtest of it opened both long and short trades, all at leverage 2.0. It is a teaching strategy and loses money on the test data.
+Source file: ShortExample. Passes backtesting, `lookahead-analysis` and `recursive-analysis` with [`tests/config.futures.json`](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/config.futures.json). A backtest of it opened both long and short trades, all at leverage 2.0. It is a teaching strategy and loses money on the test data.
 
 <!-- tested: tests/strategies/ShortExample.py lines 15-27 -->
 ```python

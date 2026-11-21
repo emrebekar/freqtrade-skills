@@ -46,7 +46,7 @@ Source file: InformativeExample.
         return dataframe
 ```
 
-The decorated method's columns get the suffix `_1h` in the main dataframe: `rsi` becomes `rsi_1h`. Use it in `populate_entry_trend` as `dataframe["rsi_1h"]`. The full file is tests/strategies/InformativeExample.py.
+The decorated method's columns get the suffix `_1h` in the main dataframe: `rsi` becomes `rsi_1h`. Use it in `populate_entry_trend` as `dataframe["rsi_1h"]`. The full file is [tests/strategies/InformativeExample.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/InformativeExample.py).
 
 Decorator facts from the docs:
 - Signature: `informative(timeframe, asset="", fmt=None, *, candle_type=None, ffill=True, cache=True)`.

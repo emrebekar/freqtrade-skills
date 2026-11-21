@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade strategy migration (v2 to v3)
 
-Updates old strategies and configs to the Freqtrade 2026.10 interface (strategy interface version 3). Users trade real money: a wrong rename can silently change trading behavior, so migrate in small steps and prove the result with a before and after backtest. The example pair (tests/fixtures/strategies/LegacyV2.py old, tests/strategies/MigratedV3.py migrated) was run on the repo's test data (BTC/USDT and ETH/USDT, 5m, 2026-08-01 to 2026-10-01). Both are teaching examples, not profitable strategies; never present their numbers as a result.
+Updates old strategies and configs to the Freqtrade 2026.10 interface (strategy interface version 3). Users trade real money: a wrong rename can silently change trading behavior, so migrate in small steps and prove the result with a before and after backtest. The example pair ([tests/fixtures/strategies/LegacyV2.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/fixtures/strategies/LegacyV2.py) old, [tests/strategies/MigratedV3.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/MigratedV3.py) migrated) was run on the repo's test data (BTC/USDT and ETH/USDT, 5m, 2026-08-01 to 2026-10-01). Both are teaching examples, not profitable strategies; never present their numbers as a result.
 
 Rules:
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives. That is the only blanket exception: pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each, never silently ignore. A pass does not prove the strategy is clean (see freqtrade-validation).
@@ -61,7 +61,7 @@ On the 2026.10 image, in spot mode, the legacy fixture (`populate_buy_trend`, `p
 
 Hyperopt `space="buy"` and `space="sell"` are unchanged (the updater leaves them alone; see freqtrade-hyperopt). The full table with before/after code and docs inconsistencies: references/v2-to-v3.md.
 
-The core of the migration, tested (tests/strategies/MigratedV3.py; the old form wrote `["buy", "buy_tag"]` and `["sell", "exit_tag"]` inside `populate_buy_trend` / `populate_sell_trend`):
+The core of the migration, tested ([tests/strategies/MigratedV3.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/MigratedV3.py); the old form wrote `["buy", "buy_tag"]` and `["sell", "exit_tag"]` inside `populate_buy_trend` / `populate_sell_trend`):
 
 <!-- tested: tests/strategies/MigratedV3.py lines 59-60 -->
 ```python
@@ -91,7 +91,7 @@ It rewrites the file in place (the original goes to `<userdir>/strategies_orig_u
 Before reporting the migrated strategy as done:
 
 1. The strategy loads (`freqtrade list-strategies`), backtests without errors and with trades, and the migrated trades match the baseline (or every difference is explained and approved by the user).
-2. `lookahead-analysis` reports no bias (`has_bias` False, no biased entry/exit signals or indicators). Fix entries before exits. The only blanket exception is FreqAI `set_freqai_targets()` columns. Pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each to the user, never silently ignore.
+2. `lookahead-analysis` reports no bias (`has_bias` No, no biased entry/exit signals or indicators). Fix entries before exits. The only blanket exception is FreqAI `set_freqai_targets()` columns. Pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each to the user, never silently ignore.
 3. `recursive-analysis` shows near-zero variance (the project checks use at most 0.5% at the declared `startup_candle_count`); otherwise raise `startup_candle_count`, not the tolerance.
 4. No `DEPRECATED` lines remain in the backtest log.
 5. Only after 1 to 4, suggest a dry run. Live trading is the user's separate, explicit decision.
@@ -108,9 +108,9 @@ Details of these commands: freqtrade-validation.
 
 | File | Shows |
 |------|-------|
-| tests/fixtures/strategies/LegacyV2.py | Old interface: v2 method names, columns and settings (still loads in spot) |
-| tests/strategies/MigratedV3.py | The same strategy migrated by hand (passes backtesting, lookahead and recursive checks) |
-| tests/test_migration_fixtures.sh | Manual suite: legacy vs migrated vs updater trade equality, updater gaps, `buy_tag` crash |
+| [tests/fixtures/strategies/LegacyV2.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/fixtures/strategies/LegacyV2.py) | Old interface: v2 method names, columns and settings (still loads in spot) |
+| [tests/strategies/MigratedV3.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/MigratedV3.py) | The same strategy migrated by hand (passes backtesting, lookahead and recursive checks) |
+| [tests/test_migration_fixtures.sh](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/test_migration_fixtures.sh) | Manual suite: legacy vs migrated vs updater trade equality, updater gaps, `buy_tag` crash |
 
 ## References
 

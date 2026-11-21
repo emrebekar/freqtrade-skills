@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade FreqAI
 
-FreqAI trains a model on your features to predict targets (labels) you define, retrains it on a sliding window, and hands the predictions back to the strategy as dataframe columns. Freqtrade version assumed: 2026.10. Users trade real money and ML adds new ways to fool yourself: labels look into the future on purpose, a backtest hides retraining assumptions, and the usual look-ahead check cannot see most feature bugs. State plainly what a pass does not prove. The example `FreqaiExample` (tests/strategies/) was run on the repo's test data; it is a teaching example, not a profitable strategy, never present its numbers as a result (it lost money in the test range).
+FreqAI trains a model on your features to predict targets (labels) you define, retrains it on a sliding window, and hands the predictions back to the strategy as dataframe columns. Freqtrade version assumed: 2026.10. Users trade real money and ML adds new ways to fool yourself: labels look into the future on purpose, a backtest hides retraining assumptions, and the usual look-ahead check cannot see most feature bugs. State plainly what a pass does not prove. The example `FreqaiExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) was run on the repo's test data; it is a teaching example, not a profitable strategy, never present its numbers as a result (it lost money in the test range).
 
 Rules:
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives (docs: "not biased and can safely be ignored"). That is the only blanket exception: pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each, never silently ignore. Read "Validation gate" below: both commands are much weaker on FreqAI strategies than on plain ones.
@@ -44,7 +44,7 @@ freqtrade recursive-analysis --strategy MyFreqaiStrategy --config config.json --
 Required: `startup_candle_count`, `populate_indicators()` calling `self.freqai.start()`, at least one `feature_engineering_*()` that sets `%`-prefixed columns, and `set_freqai_targets()` that sets `&`-prefixed columns. The tested code is in references/feature-engineering.md; the shape:
 
 ```python
-    startup_candle_count: int = 40  # largest indicator period, docs advise doubling it
+    startup_candle_count: int = 40  # largest indicator period, docs advise doubling it; used because recursive-analysis cannot assess FreqAI features
 
     def feature_engineering_expand_all(self, dataframe, period, metadata, **kwargs): ...
     def feature_engineering_expand_basic(self, dataframe, metadata, **kwargs): ...
@@ -100,7 +100,7 @@ Before reporting a FreqAI strategy as done, show the user:
 
 Only then suggest a dry run. Live trading is the user's separate, explicit decision.
 
-In this repo: `tests/run_checks.sh FreqaiExample --config tests/config.freqai.json --image freqtradeorg/freqtrade:2026.10_freqai --freqai --freqaimodel LightGBMRegressor` (about 3 minutes cold), `tests/test_freqai_fixtures.sh` for the false-negative and flagged fixtures.
+In the freqtrade-skills repository (/tests): `tests/run_checks.sh FreqaiExample --config tests/config.freqai.json --image freqtradeorg/freqtrade:2026.10_freqai --freqai --freqaimodel LightGBMRegressor` (about 3 minutes cold), [`tests/test_freqai_fixtures.sh`](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/test_freqai_fixtures.sh) for the false-negative and flagged fixtures.
 
 ## References
 

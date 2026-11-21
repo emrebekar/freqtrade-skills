@@ -48,7 +48,7 @@ Real output (IndicatorsExample, `startup_candle_count = 200`, run with `--startu
 - Header cells are startup candle counts; cell values are variance against the benchmark.
 - `-` is no variance. `nan%` means the indicator cannot be calculated with so few candles (the docs' example: RSI length 30 needs more than 21 candles).
 - Docs: assess the table per indicator and decide whether the chosen `startup_candle_count` leaves a variance small enough that the indicator has no effect on entries and exits. Absolute zero (`-`) is not necessarily best, since some indicators need a very long startup to get there.
-- Repo rule (`tests/check_results.py`, a repo choice because the docs give no number): fail when any indicator at the `(from strategy)` column differs by more than 0.5%, shows `nan%`, or the column or table is missing.
+- Repo rule ([`tests/check_results.py`](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/check_results.py), a repo choice because the docs give no number): fail when any indicator at the `(from strategy)` column differs by more than 0.5%, shows `nan%`, or the column or table is missing.
 
 ## Caveats (docs)
 

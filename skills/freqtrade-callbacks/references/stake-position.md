@@ -105,4 +105,4 @@ def leverage(self, pair: str, current_time: datetime, current_rate: float,
              **kwargs) -> float:
 ```
 
-Docs: "This method is only called in futures mode"; default is 1 (no leverage). Profit, stoploss and ROI all include leverage: a 10% stoploss at 10x triggers on a 1% move. A working `leverage()` example that runs in the futures config is in freqtrade-strategy references/leverage-shorting.md (tests/strategies/ShortExample.py).
+Docs: "This method is only called in futures mode"; default is 1 (no leverage). Profit, stoploss and ROI all include leverage: a 10% stoploss at 10x triggers on a 1% move. A working `leverage()` example that runs in the futures config is in freqtrade-strategy references/leverage-shorting.md ([tests/strategies/ShortExample.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/ShortExample.py)).

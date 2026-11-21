@@ -7,7 +7,7 @@ Source: docs/strategy-customization.md#strategy-startup-period
 
 Backtesting hands the whole dataframe to `populate_*()` at once, so anything that reads other rows' data than the past is invisible in a backtest and wrong live. Each entry shows the WRONG pattern and a RIGHT one. How to read the labels:
 
-- `fixture:` the WRONG code is in tests/fixtures/strategies/ and was run through `lookahead-analysis` (outcome stated). Run `tests/test_lookahead_fixtures.sh` to reproduce.
+- `fixture:` the WRONG code is in [tests/fixtures/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/fixtures/strategies/) and was run through `lookahead-analysis` (outcome stated). Run [`tests/test_lookahead_fixtures.sh`](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/test_lookahead_fixtures.sh) to reproduce.
 - `WRONG (untested illustration)`: never run by the repo tests.
 - RIGHT blocks with a `tested:` comment are byte-identical to lines of a strategy that passes backtesting, `lookahead-analysis` and `recursive-analysis` in this repo. RIGHT blocks marked docs are copied from the Freqtrade docs and not run.
 
@@ -156,7 +156,7 @@ def populate_entry_trend(self, dataframe, metadata):
     dataframe["ema"] = ta.EMA(dataframe, timeperiod=50)
 ```
 
-RIGHT: create the column in `populate_indicators` (see lines 20-29 of tests/strategies/ValidationExample.py, quoted above in parts).
+RIGHT: create the column in `populate_indicators` (see lines 20-29 of [tests/strategies/ValidationExample.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/ValidationExample.py), quoted above in parts).
 
 ## 9. Logic that depends on the pairlist (false positive)
 

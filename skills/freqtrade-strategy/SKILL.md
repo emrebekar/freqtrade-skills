@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade strategy development
 
-How to write a correct Freqtrade strategy. Freqtrade version assumed: 2026.10, strategy interface version 3. Every example class here was run through backtesting, `lookahead-analysis` and `recursive-analysis` on test data (tests/strategies/). They are teaching examples, not profitable strategies; never present them as such.
+How to write a correct Freqtrade strategy. Freqtrade version assumed: 2026.10, strategy interface version 3. Every example class here was run through backtesting, `lookahead-analysis` and `recursive-analysis` on test data ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)). They are teaching examples, not profitable strategies; never present them as such.
 
 Rules:
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives. A pass does not prove the strategy is clean; it only checks signals that fired in the tested timerange.
@@ -29,7 +29,7 @@ Rules:
 
 ## Minimal strategy (tested)
 
-Class IndicatorsExample from tests/strategies/IndicatorsExample.py: RSI, EMAs and Bollinger Bands, two tagged entries, one tagged exit, ROI, stoploss, startup candles. Full code and explanation: references/anatomy.md and references/signals.md.
+Class IndicatorsExample from [tests/strategies/IndicatorsExample.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/IndicatorsExample.py): RSI, EMAs and Bollinger Bands, two tagged entries, one tagged exit, ROI, stoploss, startup candles. Full code and explanation: references/anatomy.md and references/signals.md.
 
 <!-- tested: tests/strategies/IndicatorsExample.py lines 9-19 -->
 ```python
@@ -88,7 +88,7 @@ freqtrade recursive-analysis --strategy MyStrategy --timerange 20260801-20261001
 Before reporting the strategy as done:
 
 1. The strategy loads (`freqtrade list-strategies`) and backtests without errors and with trades (`lookahead-analysis` needs trades; widen the timerange if it reports too few).
-2. `lookahead-analysis` reports no bias (`has_bias` False, no biased entry/exit signals or indicators). Fix entries before exits. The only blanket exception is FreqAI `set_freqai_targets()` columns. Pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each to the user, never silently ignore.
+2. `lookahead-analysis` reports no bias (`has_bias` No, no biased entry/exit signals or indicators). Fix entries before exits. The only blanket exception is FreqAI `set_freqai_targets()` columns. Pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each to the user, never silently ignore.
 3. `recursive-analysis` shows near-zero variance (the project checks use at most 0.5% at the declared `startup_candle_count`); otherwise raise `startup_candle_count`, not the tolerance.
 4. Only after 1 to 3, suggest a dry run. Live trading is the user's separate, explicit decision.
 
@@ -98,10 +98,10 @@ Details of these commands and hyperopt: freqtrade-validation.
 
 | File | Shows |
 |------|-------|
-| tests/strategies/IndicatorsExample.py | Indicators, tagged signals, ROI, stoploss, startup candles |
-| tests/strategies/InformativeExample.py | `@informative("1h")` decorator |
-| tests/strategies/InformativeMergeExample.py | `dp.get_pair_dataframe` plus `merge_informative_pair` |
-| tests/strategies/ShortExample.py | `can_short`, `enter_short`, `exit_short`, `leverage()` (needs tests/config.futures.json) |
+| [tests/strategies/IndicatorsExample.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/IndicatorsExample.py) | Indicators, tagged signals, ROI, stoploss, startup candles |
+| [tests/strategies/InformativeExample.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/InformativeExample.py) | `@informative("1h")` decorator |
+| [tests/strategies/InformativeMergeExample.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/InformativeMergeExample.py) | `dp.get_pair_dataframe` plus `merge_informative_pair` |
+| [tests/strategies/ShortExample.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/ShortExample.py) | `can_short`, `enter_short`, `exit_short`, `leverage()` (needs [tests/config.futures.json](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/config.futures.json)) |
 
 ## References
 

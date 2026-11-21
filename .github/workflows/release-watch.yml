@@ -88,7 +88,7 @@ jobs:
           NEW_TAG: ${{ steps.detect.outputs.latest }}
         run: |
           if ! python3 scripts/docs_diff.py --old "$OLD_TAG" --new "$NEW_TAG" --skills skills > docs-diff.md; then
-            echo "Docs diff failed, see the workflow run ()." > docs-diff.md
+            echo "Docs diff failed, see the workflow run ($RUN_URL)." > docs-diff.md
           fi
 
       - name: Open issue
@@ -112,7 +112,7 @@ jobs:
             echo
             echo "Workflow run: $RUN_URL"
             echo
-            echo "To refresh: update the affected reference files, bump \`freqtrade-version.json\`, \`tests/strategies.json\` image tags and each SKILL.md footer, then open a reviewed PR."
+            echo "To refresh: update the affected reference files, then run 'git grep -n 2026.10' and bump every hit (workflows, scripts/dpy.sh, tests/*, README, freqtrade-version.json, SKILL footers), then open a reviewed PR."
           } > body-foot.md
           # Only the docs diff is truncated, so the summary and footer always survive.
           budget=$(( limit - $(wc -c < body-head.md) - $(wc -c < body-foot.md) - 200 ))
