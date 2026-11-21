@@ -1,0 +1,120 @@
+name: release-watch
+
+# Weekly: when Freqtrade ships a new stable release, test the skills against it and open an
+# issue with the result plus the doc sections that changed (mapped to the reference files that
+# cite them). The content rewrite itself stays a reviewed PR; nothing is committed here.
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Detect new release
+        id: detect
+        run: |
+          set -euo pipefail
+          latest="$(gh release view -R freqtrade/freqtrade --json tagName -q .tagName)"
+          # The tag is external input: accept only a plain version before it reaches docker or git.
+          [[ "$latest" =~ ^[0-9]{4}\.[0-9]+(\.[0-9]+)?$ ]] || { echo "unexpected tag: $latest" >&2; exit 1; }
+          current="$(python3 -c 'import json; print(json.load(open("freqtrade-version.json"))["tag"])')"
+          title="Freqtrade $latest released: refresh skills"
+          echo "latest=$latest current=$current"
+          if [ "$latest" = "$current" ]; then
+            echo "Already on $current, nothing to do."
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if gh issue list --state open --limit 200 --json title -q '.[].title' | grep -Fxq -- "$title"; then
+            echo "Open issue \"$title\" exists, skipping."
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          {
+            echo "proceed=true"
+            echo "latest=$latest"
+            echo "current=$current"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Test skills against the new image
+        if: steps.detect.outputs.proceed == 'true'
+        continue-on-error: true
+        env:
+          NEW_TAG: ${{ steps.detect.outputs.latest }}
+        run: |
+          set -uo pipefail
+          export FT_IMAGE="freqtradeorg/freqtrade:$NEW_TAG"   # scripts/dpy.sh
+          export FT_TAG="$NEW_TAG"                             # tests/run_all.sh
+          : > test-summary.md
+          fail=0
+          check() {  # check <label> <cmd...>: run, log, record pass/fail
+            local label="$1"; shift
+            if "$@" > "log-${label// /_}.txt" 2>&1; then
+              echo "- PASS: $label" >> test-summary.md
+            else
+              echo "- FAIL: $label" >> test-summary.md
+              fail=1
+            fi
+          }
+          docker pull "$FT_IMAGE" || { echo "- FAIL: docker pull $FT_IMAGE" >> test-summary.md; exit 1; }
+          docker pull "${FT_IMAGE}_freqai" || echo "- WARN: docker pull ${FT_IMAGE}_freqai failed" >> test-summary.md
+          check "validate_skills" scripts/dpy.sh scripts/validate_skills.py
+          check "check_cli" scripts/dpy.sh scripts/check_cli.py
+          check "strategies (backtest, lookahead, recursive)" bash tests/run_all.sh
+          check "hyperopt" bash tests/run_hyperopt.sh HyperoptExample --image "$FT_IMAGE"
+          # Keep the tail of each failing log for the issue.
+          for f in log-*.txt; do
+            lbl="${f#log-}"; lbl="${lbl%.txt}"
+            if grep -q "FAIL: ${lbl//_/ }" test-summary.md; then
+              { echo; echo "<details><summary>${lbl//_/ } log (tail)</summary>"; echo; echo '```'; tail -n 40 "$f"; echo '```'; echo; echo "</details>"; } >> test-summary.md
+            fi
+          done
+          exit "$fail"
+
+      - name: Diff docs
+        if: steps.detect.outputs.proceed == 'true'
+        env:
+          OLD_TAG: ${{ steps.detect.outputs.current }}
+          NEW_TAG: ${{ steps.detect.outputs.latest }}
+        run: python3 scripts/docs_diff.py --old "$OLD_TAG" --new "$NEW_TAG" --skills skills > docs-diff.md
+
+      - name: Open issue
+        if: steps.detect.outputs.proceed == 'true'
+        env:
+          OLD_TAG: ${{ steps.detect.outputs.current }}
+          NEW_TAG: ${{ steps.detect.outputs.latest }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          limit=60000   # GitHub issue body maximum is 65536 characters
+          {
+            echo "Freqtrade \`$NEW_TAG\` is the latest stable release; the skills are pinned to \`$OLD_TAG\`."
+            echo
+            echo "## Test results against \`$NEW_TAG\`"
+            echo
+            if [ -s test-summary.md ]; then cat test-summary.md; else echo "Tests did not run (see workflow run)."; fi
+            echo
+            cat docs-diff.md
+            echo
+            echo "Workflow run: $RUN_URL"
+            echo
+            echo "To refresh: update the affected reference files, bump \`freqtrade-version.json\`, \`tests/strategies.json\` image tags and each SKILL.md footer, then open a reviewed PR."
+          } > body-full.md
+          if [ "$(wc -m < body-full.md)" -gt "$limit" ]; then
+            { head -c "$limit" body-full.md; printf '\n\n_Truncated, see the workflow run for the full report._\n'; } > body.md
+          else
+            cp body-full.md body.md
+          fi
+          gh issue create --title "Freqtrade $NEW_TAG released: refresh skills" --body-file body.md

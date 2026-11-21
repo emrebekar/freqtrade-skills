@@ -7,6 +7,8 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 MANIFEST="${MANIFEST:-tests/strategies.json}"
 PY="${PY:-scripts/dpy.sh}"
+# FT_TAG=<tag> retargets every manifest image (x:2026.10 and x:2026.10_freqai) to that release.
+FT_TAG="${FT_TAG:-}"
 
 rows="$("$PY" -c '
 import json, sys
@@ -18,6 +20,7 @@ for e in json.load(open(sys.argv[1])):
 
 fail=0
 while IFS='|' read -r strategy config image freqai spath model; do
+  if [ -n "$FT_TAG" ]; then suffix=""; [[ "$image" == *_freqai ]] && suffix="_freqai"; image="${image%%:*}:${FT_TAG}${suffix}"; fi
   args=("$strategy" --config "$config" --image "$image" --strategy-path "$spath")
   [ "$freqai" = "True" ] && args+=(--freqai)
   [ -n "$model" ] && args+=(--freqaimodel "$model")

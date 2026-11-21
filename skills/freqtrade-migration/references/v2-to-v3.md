@@ -1,4 +1,4 @@
-Source: docs/strategy_migration.md#quick-summary--migration-checklist
+Source: docs/strategy_migration.md#quick-summary-migration-checklist
 Source: docs/strategy_migration.md#extensive-explanation
 Source: docs/strategy-customization.md (INTERFACE_VERSION paragraph)
 
