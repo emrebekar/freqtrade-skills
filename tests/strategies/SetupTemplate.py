@@ -91,7 +91,8 @@ class SetupTemplate(IStrategy):
     ignore_roi_if_entry_signal = False
 
     # Number of candles the strategy requires before producing valid signals
-    startup_candle_count: int = 30
+    # Template default (30) fails recursive-analysis; 200 chosen via recursive-analysis.
+    startup_candle_count: int = 200
 
     # Strategy parameters
     buy_rsi = IntParameter(10, 40, default=30, space="buy")

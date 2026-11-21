@@ -96,6 +96,8 @@ freqtrade new-strategy --strategy MyStrategy --userdir user_data --template full
 
 Templates: `minimal` (bare skeleton), `full` (default; sample indicators), `advanced` (extra callbacks). The file is written to `user_data/strategies/MyStrategy.py`. The class name must equal `--strategy`. Use `--strategy-path` to look in another directory.
 
+Pitfall: a generated template's default `startup_candle_count` can be too low for its indicators (the `full` template ships 30 and fails `recursive-analysis`). Run `freqtrade recursive-analysis` and raise it before trusting backtests.
+
 ## 5. Download data
 
 ```bash
