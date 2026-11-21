@@ -92,7 +92,7 @@ Observed: on `LookaheadBad` the command printed no result table at all (tests/ru
 | `has_bias` Yes, only `biased_indicators` | An indicator column differs on slices | Find that column in `populate_indicators` |
 | biased exits only | Often follows biased entries | Fix entries, re-run |
 | "too few trades caught" | Not enough trades, no verdict | Widen timerange, add pairs, loosen conditions for the test |
-| Flag on `&` columns with FreqAI | Documented false positive in `set_freqai_targets()` | Ignore those columns only (repo gloss: they are the `&`-prefixed targets) |
+| Flag on `&` columns with FreqAI | Documented false positive in `set_freqai_targets()`. Observed: `do_predict` and the `enter_*`/`exit_*` columns are flagged too because they derive from the targets; a leaky `%` feature is not flagged at all (see freqtrade-freqai) | Ignore the `&` targets and their derived outputs only, with 0 biased entry/exit signals; review feature code by hand (repo gloss) |
 | Flag only with `len(self.dp.current_whitelist())` or pair ranking | Verification runs one pair alone: false positive per docs | Do not depend on the pairlist in strategy methods, or explain it |
 | Flag with limit orders and `custom_entry_price()` | Docs: can cause late entries and false positives | Check with the default market orders |
 | Recursive variance above your limit at the strategy's column | Too few startup candles | Raise `startup_candle_count` |

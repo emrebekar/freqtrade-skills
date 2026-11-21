@@ -1,7 +1,7 @@
 """Parse freqtrade lookahead/recursive output. Stdlib only. Exit 1 on failure.
 
 usage: check_results.py lookahead CSV [--freqai]
-       check_results.py recursive LOG
+       check_results.py recursive LOG [--freqai]
 """
 import csv
 import re
@@ -12,6 +12,10 @@ import sys
 # strategy's own startup_candle_count column.
 RECURSIVE_MAX_VARIANCE_PCT = 0.5
 STRATEGY_COL = "(from strategy)"
+# --freqai: columns lookahead-analysis flags only because they derive from the targets (observed on 2026.10,
+# docs name only the set_freqai_targets() columns): FreqAI outputs and the signals built from them.
+# Signal bias itself is still caught by the biased_entry/exit_signals counts.
+FREQAI_DERIVED = {"do_predict", "DI_values", "enter_long", "enter_short", "exit_long", "exit_short", "enter_tag", "exit_tag"}
 
 
 def lookahead(path, freqai):
@@ -21,8 +25,8 @@ def lookahead(path, freqai):
         return False, "lookahead: FAIL (empty result)"
     row = rows[0]
     inds = [i for i in row["biased_indicators"].split(",") if i]
-    if freqai:  # set_freqai_targets() columns (&-prefixed) are documented false positives
-        inds = [i for i in inds if not i.startswith("&")]
+    if freqai:  # &-prefixed targets: documented false positives; FREQAI_DERIVED: observed, see above
+        inds = [i for i in inds if not i.startswith("&") and i not in FREQAI_DERIVED]
     entry, exit_ = int(row["biased_entry_signals"]), int(row["biased_exit_signals"])
     biased = entry > 0 or exit_ > 0 or (bool(inds) if freqai else row["has_bias"] == "True")
     detail = f"entry={entry} exit={exit_} indicators={','.join(inds) or '-'}"
@@ -33,7 +37,7 @@ def _cells(line):
     return [c.strip() for c in line.strip().strip("│┃").replace("┃", "│").split("│")]
 
 
-def recursive(path):
+def recursive(path, freqai=False):
     with open(path, encoding="utf-8") as fh:
         lines = [ln for ln in fh if ln.strip().startswith(("┃", "│"))]
     header = next((_cells(ln) for ln in lines if "Indicators" in ln), None)
@@ -48,6 +52,8 @@ def recursive(path):
         row = _cells(ln)
         if row == header:
             continue
+        if freqai and row[0].startswith("&"):  # model outputs: retrained on different data per startup count, not recursion evidence
+            continue
         if len(row) != len(header):
             bad.append(f"malformed row {row[0] if row else '?'}")
             continue
@@ -59,6 +65,8 @@ def recursive(path):
         if not m or abs(float(m.group(1))) > RECURSIVE_MAX_VARIANCE_PCT:
             bad.append(f"{row[0]}={raw}")
     startup = header[col].split()[0]
+    if not seen and freqai and not bad:  # only model outputs listed: nothing to assess, say so instead of passing silently
+        return True, "recursive: NOT ASSESSED (--freqai: table lists only &-targets; features are not testable, see freqtrade-freqai)"
     if not seen:
         return False, "recursive: FAIL (table has no indicator rows)"
     if bad:
@@ -69,7 +77,7 @@ def recursive(path):
 if __name__ == "__main__":
     kind, path = sys.argv[1], sys.argv[2]
     try:
-        ok, msg = lookahead(path, "--freqai" in sys.argv) if kind == "lookahead" else recursive(path)
+        ok, msg = lookahead(path, "--freqai" in sys.argv) if kind == "lookahead" else recursive(path, "--freqai" in sys.argv)
     except (OSError, KeyError, ValueError) as exc:
         ok, msg = False, f"{kind}: FAIL ({type(exc).__name__}: {exc})"
     print(msg)

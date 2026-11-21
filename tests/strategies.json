@@ -8,5 +8,6 @@
   {"strategy": "CallbacksExample", "config": "tests/config.test.json", "image": "freqtradeorg/freqtrade:2026.10", "freqai": false},
   {"strategy": "PositionAdjustExample", "config": "tests/config.test.json", "image": "freqtradeorg/freqtrade:2026.10", "freqai": false},
   {"strategy": "ValidationExample", "config": "tests/config.test.json", "image": "freqtradeorg/freqtrade:2026.10", "freqai": false},
-  {"strategy": "HyperoptExample", "config": "tests/config.test.json", "image": "freqtradeorg/freqtrade:2026.10", "freqai": false}
+  {"strategy": "HyperoptExample", "config": "tests/config.test.json", "image": "freqtradeorg/freqtrade:2026.10", "freqai": false},
+  {"strategy": "FreqaiExample", "config": "tests/config.freqai.json", "image": "freqtradeorg/freqtrade:2026.10_freqai", "freqai": true, "freqaimodel": "LightGBMRegressor"}
 ]

@@ -55,7 +55,7 @@ else
 fi
 
 if ft recursive-analysis "${COMMON[@]}" >"$OUT/recursive.log" 2>&1; then
-  run --entrypoint python "$IMAGE" -I tests/check_results.py recursive "$OUT/recursive.log" || fail=1
+  run --entrypoint python "$IMAGE" -I tests/check_results.py recursive "$OUT/recursive.log" $FREQAI || fail=1
 else
   echo "recursive: FAIL (command failed; see $OUT/recursive.log)"; fail=1
 fi
