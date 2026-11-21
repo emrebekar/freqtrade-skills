@@ -38,7 +38,10 @@ fail=0
 
 ft create-userdir --userdir "$USERDIR" >"$OUT/create-userdir.log" 2>&1 || { echo "setup: FAIL (create-userdir; see $OUT/create-userdir.log)"; exit 1; }
 
-if ft backtesting "${COMMON[@]}" --export none >"$OUT/backtest.log" 2>&1; then
+# freqtrade exits 0 on some errors (bad --timerange, unrecognized args), so also require error-free output and a results table.
+if ft backtesting "${COMMON[@]}" --export none >"$OUT/backtest.log" 2>&1 \
+   && ! grep -Eq '(^|[ ])(ERROR|CRITICAL)[ ]|: error: |Traceback \(most recent call last\)' "$OUT/backtest.log" \
+   && grep -q "BACKTESTING REPORT" "$OUT/backtest.log"; then
   echo "backtest: OK"
 else
   echo "backtest: FAIL (see $OUT/backtest.log)"; fail=1

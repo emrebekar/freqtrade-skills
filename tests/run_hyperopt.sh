@@ -42,20 +42,30 @@ BASE=(-c "$CONFIG" --userdir "$USERDIR" -d "$DATADIR" --no-color)
 ft create-userdir --userdir "$USERDIR" >"$OUT/create-userdir.log" 2>&1 || { echo "setup: FAIL (see $OUT/create-userdir.log)"; exit 1; }
 
 # shellcheck disable=SC2086 # SPACES is a deliberate space-separated list
-if ft hyperopt "${BASE[@]}" --strategy-path "$COPY" -s "$STRATEGY" --timerange "$TIMERANGE" \
-     ${LOSSPATH:+--hyperopt-path "$LOSSPATH"} --hyperopt-loss "$LOSS" --spaces $SPACES -e "$EPOCHS" -j 1 --random-state 42 >"$OUT/hyperopt.log" 2>&1; then
-  echo "hyperopt: OK ($EPOCHS epochs, $SPACES, $LOSS, $TIMERANGE)"
-else
-  echo "hyperopt: FAIL (see $OUT/hyperopt.log)"; exit 1
-fi
+ft hyperopt "${BASE[@]}" --strategy-path "$COPY" -s "$STRATEGY" --timerange "$TIMERANGE" \
+  ${LOSSPATH:+--hyperopt-path "$LOSSPATH"} --hyperopt-loss "$LOSS" --spaces $SPACES -e "$EPOCHS" -j 1 --random-state 42 >"$OUT/hyperopt.log" 2>&1 \
+  || { echo "hyperopt: FAIL (non-zero exit; see $OUT/hyperopt.log)"; exit 1; }
 
+# freqtrade exits 0 on argparse errors and on "No good result found" (observed), so exit codes are not
+# enough: scan for error lines AND require positive evidence of a result in each log.
+ERR_RE='(^|[ ])(ERROR|CRITICAL)[ ]|: error: |Traceback \(most recent call last\)'
 fail=0
-# freqtrade returned exit 0 on an argparse error (observed with hyperopt-show -s), so also scan the logs
-if grep -q "error: " "$OUT/hyperopt.log"; then echo "hyperopt: FAIL (argument error in log)"; exit 1; fi
-if grep -q "No good result found" "$OUT/hyperopt.log"; then echo "hyperopt: FAIL (no result met the loss function / --min-trades; exit code was 0)"; exit 1; fi
-ft hyperopt-list "${BASE[@]}" >"$OUT/hyperopt-list.log" 2>&1 && echo "hyperopt-list: OK" || { echo "hyperopt-list: FAIL (see $OUT/hyperopt-list.log)"; fail=1; }
-ft hyperopt-show "${BASE[@]}" --best -n -1 >"$OUT/hyperopt-show.log" 2>&1 \
-  && echo "hyperopt-show: OK" || { echo "hyperopt-show: FAIL (see $OUT/hyperopt-show.log)"; fail=1; }
-grep -q "error: " "$OUT/hyperopt-list.log" "$OUT/hyperopt-show.log" && { echo "list/show: FAIL (argument error in log)"; fail=1; }
+check() { # check <label> <logfile> <positive-regex> <what-it-proves>
+  if grep -Eq "$ERR_RE" "$2"; then echo "$1: FAIL (error line in $2)"; fail=1
+  elif ! grep -Eq "$3" "$2"; then echo "$1: FAIL (no $4 in $2)"; fail=1
+  else echo "$1: OK"; fi
+}
+if grep -q "No good result found" "$OUT/hyperopt.log"; then
+  echo "hyperopt: FAIL (no result met the loss function / --min-trades; exit code was 0)"; exit 1
+fi
+ls "$OUT"/user_data/hyperopt_results/*.fthypt >/dev/null 2>&1 \
+  || { echo "hyperopt: FAIL (no hyperopt_results/*.fthypt file written)"; exit 1; }
+
+check hyperopt "$OUT/hyperopt.log" '^Best result:' '"Best result" block'
+ft hyperopt-list "${BASE[@]}" >"$OUT/hyperopt-list.log" 2>&1
+check hyperopt-list "$OUT/hyperopt-list.log" '^│ .*[0-9]+/[0-9]+ ' 'epoch table rows'
+ft hyperopt-show "${BASE[@]}" --best -n -1 >"$OUT/hyperopt-show.log" 2>&1
+check hyperopt-show "$OUT/hyperopt-show.log" '^Result for strategy' 'epoch details ("Result for strategy")'
+[ $fail -eq 0 ] && echo "summary: $EPOCHS epochs, $SPACES, $LOSS, $TIMERANGE"
 [ -f "$COPY/$STRATEGY.json" ] && echo "params file: $COPY/$STRATEGY.json (temp copy only)"
 exit $fail
