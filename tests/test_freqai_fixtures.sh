@@ -46,7 +46,7 @@ run "$IMAGE" create-userdir --userdir "$USERDIR" >"$OUT/create-userdir.log" 2>&1
 # dir:name:expected. missed = known false negative (leaky %- feature is dropped before the strategy sees it).
 for spec in tests/strategies:FreqaiExample:pass tests/fixtures/strategies:FreqaiLookaheadBadReturned:fail tests/fixtures/strategies:FreqaiLookaheadBad:pass; do
   IFS=: read -r dir s want <<< "$spec"; csv="$OUT/$s.csv"
-  run "$IMAGE" lookahead-analysis -c tests/config.freqai.json --userdir "$USERDIR" -d tests/data/binance \
+  run "$IMAGE" lookahead-analysis -c tests/config.freqai.json --userdir "$USERDIR" -d tests/data/okx \
     --timerange 20260801-20261001 --strategy-path "$dir" -s "$s" --freqaimodel LightGBMRegressor --no-color \
     --lookahead-analysis-exportfilename "$csv" >"$OUT/$s.log" 2>&1
   if [ ! -f "$csv" ]; then echo "$s: FAIL (no result; see $OUT/$s.log)"; fail=1; continue; fi

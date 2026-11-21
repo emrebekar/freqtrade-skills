@@ -9,7 +9,7 @@ cd "$(dirname "$0")/.."
 STRATEGY="$1"; shift
 MODEL=""; CONFIG="tests/config.test.json"; SPATH="tests/strategies"; IMAGE="freqtradeorg/freqtrade:2026.10"; FREQAI=""
 # freqtrade ignores the config's "datadir" key, so pass it on the CLI.
-DATADIR="tests/data/binance"; TIMERANGE="20260801-20261001"
+DATADIR="tests/data/okx"; TIMERANGE="20260801-20261001"
 while [ $# -gt 0 ]; do
   case "$1" in
     --config) CONFIG="$2"; shift 2 ;;
@@ -53,8 +53,9 @@ if ft lookahead-analysis "${COMMON[@]}" --lookahead-analysis-exportfilename "$OU
 else
   echo "lookahead: FAIL (command failed or no result; see $OUT/lookahead.log)"; fail=1
 fi
+# OKX serves 300 candles per call and freqtrade rejects more than 5x, so the default 1999 column fails; 1499 is the largest allowed.
 
-if ft recursive-analysis "${COMMON[@]}" >"$OUT/recursive.log" 2>&1; then
+if ft recursive-analysis "${COMMON[@]}" --startup-candle 199 399 499 999 1499 >"$OUT/recursive.log" 2>&1; then
   run --entrypoint python "$IMAGE" -I tests/check_results.py recursive "$OUT/recursive.log" $FREQAI || fail=1
 else
   echo "recursive: FAIL (command failed; see $OUT/recursive.log)"; fail=1
