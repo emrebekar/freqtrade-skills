@@ -9,7 +9,16 @@ ALLOWED_KEYS = {"name", "description", "license"}
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 LINK_RE = re.compile(r"(?<!!)\[[^\]]*\]\(([^)\s]+)[^)]*\)")
 FOOTER_RE = re.compile(r"^Built from Freqtrade docs \S+ \(\S+\)\. Source: https://github\.com/freqtrade/freqtrade/tree/\S+/docs\s*$", re.M)
+FENCE_RE = re.compile(r"^(```|~~~).*?^\1[ \t]*$", re.M | re.S)
 MAX_LINES, MAX_NAME, MAX_DESC = 300, 64, 1024
+
+
+def read(path):
+    """Return (text, error); utf-8-sig tolerates a BOM."""
+    try:
+        return path.read_text(encoding="utf-8-sig"), None
+    except (UnicodeDecodeError, OSError) as e:
+        return None, f"{path}: cannot read ({e})"
 
 
 def parse_frontmatter(lines):
@@ -33,7 +42,9 @@ def check_skill(d, agents_text):
     md = d / "SKILL.md"
     if not md.is_file():
         return [f"{d}: missing SKILL.md"]
-    text = md.read_text(encoding="utf-8")
+    text, rerr = read(md)
+    if rerr:
+        return [rerr]
     lines = text.splitlines()
     p = str(md)
     fm, err = parse_frontmatter(lines)
@@ -50,25 +61,31 @@ def check_skill(d, agents_text):
     if name and name != d.name:
         errs.append(f"{p}: name '{name}' != folder '{d.name}'")
     desc = fm.get("description", "")
-    if not desc:
+    if desc in (">", "|", ">-", "|-", ">+", "|+"):
+        errs.append(f"{p}: description block scalar unsupported, use a single line")
+    elif not desc:
         errs.append(f"{p}: description missing")
     elif len(desc) > MAX_DESC:
         errs.append(f"{p}: description {len(desc)} chars > {MAX_DESC}")
     if len(lines) > MAX_LINES:
         errs.append(f"{p}: {len(lines)} lines > {MAX_LINES}")
-    if not FOOTER_RE.search(text):
-        errs.append(f"{p}: footer line missing")
-    for md_file in [md, *sorted((d / "references").glob("*.md"))]:
-        for target in LINK_RE.findall(md_file.read_text(encoding="utf-8")):
+    last = next((ln for ln in reversed(lines) if ln.strip()), "")
+    if not FOOTER_RE.match(last):
+        errs.append(f"{p}: footer line missing or not the last non-empty line")
+    refs = sorted((d / "references").glob("*.md"))
+    for md_file in [md, *refs]:
+        body, rerr = (text, None) if md_file == md else read(md_file)
+        if rerr:
+            errs.append(rerr)
+            continue
+        for target in LINK_RE.findall(FENCE_RE.sub("", body)):
             if re.match(r"^([a-z]+:|#|/)", target):
                 continue
             if not (md_file.parent / target.split("#")[0]).exists():
                 errs.append(f"{md_file}: broken link '{target}'")
-    for ref in sorted((d / "references").glob("*.md")):
-        first = ref.read_text(encoding="utf-8").splitlines()[:1]
-        if not first or not first[0].startswith("Source: "):
-            errs.append(f"{ref}: first line must start with 'Source: '")
-    if d.name not in agents_text:
+        if md_file != md and not body.startswith("Source: "):
+            errs.append(f"{md_file}: first line must start with 'Source: '")
+    if not re.search(rf"(?<![\w-]){re.escape(d.name)}(?![\w-])", agents_text):
         errs.append(f"{d}: not listed in AGENTS file")
     return errs
 
@@ -85,9 +102,13 @@ def main():
     if not agents.is_file():
         print(f"{agents}: agents file not found")
         return 1
-    agents_text = agents.read_text(encoding="utf-8")
+    agents_text, rerr = read(agents)
+    if rerr:
+        print(rerr)
+        return 1
     errs = [e for d in sorted(p for p in root.iterdir() if p.is_dir()) for e in check_skill(d, agents_text)]
-    print("\n".join(errs))
+    if errs:
+        print("\n".join(errs))
     return 1 if errs else 0
 
 
