@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Self-test for validate_skills.py. CI: PY=python bash tests/test_validate_skills.sh
+set -u
+cd "$(dirname "$0")/.."
+PY="${PY:-scripts/dpy.sh}"
+V="scripts/validate_skills.py"
+fail=0
+
+out=$($PY $V --root tests/fixtures/skills_bad 2>&1); rc=$?
+[ "$rc" -eq 1 ] || { echo "FAIL bad root: exit $rc, want 1"; fail=1; }
+for pat in "name" "description" "references/missing.md" "AGENTS"; do
+  echo "$out" | grep -q "$pat" || { echo "FAIL bad root: no '$pat' error"; fail=1; }
+done
+
+out=$($PY $V --root tests/fixtures/skills_good --agents tests/fixtures/skills_good/AGENTS.md 2>&1); rc=$?
+[ "$rc" -eq 0 ] || { echo "FAIL good root: exit $rc"; echo "$out"; fail=1; }
+
+[ "$fail" -eq 0 ] && echo "OK: validator self-test passed"
+exit $fail
