@@ -24,6 +24,8 @@ freqtrade recursive-analysis --strategy MyStrategy --timerange 20260801-20261001
 
 The defaults are odd numbers on purpose: the last candle is the current one, the others are startup candles. Binance returns 1000 candles per call; asking for 1001 would make the bot fetch 2000. Exchanges also limit consecutive calls (Binance: 5), so about 5000 candles is the ceiling and the maximum `startup_candle_count` is 4999. The docs warn that exchange limits can change without notice. Observed warning at 1999: `Using 2 calls to get OHLCV ... Please check if you really need 1999 candles`.
 
+Observed on OKX sample data: the default 1999 column aborts with "This strategy requires 1999 candles to start, which is more than 5x (1499 candles) the amount of candles OKX provides for 5m". Pass `--startup-candle` values up to 1499 on such exchanges (the repo harness uses 199 399 499 999 1499).
+
 ## How it works
 
 1. Initial indicator calculation on the full timerange as benchmark.
