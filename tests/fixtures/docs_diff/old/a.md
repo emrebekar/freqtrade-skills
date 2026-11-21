@@ -12,3 +12,15 @@ bye
 ```
 ## not a heading
 ```
+
+## Parent Topic
+parent body
+
+### Child `Detail_X`
+old child
+
+## Dup
+first
+
+## Dup
+second old

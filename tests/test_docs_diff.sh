@@ -7,7 +7,7 @@ out="$(scripts/dpy.sh scripts/docs_diff.py --old-dir $F/old --new-dir $F/new --s
 fail=0
 has() { grep -qF -- "$1" <<<"$out" || { echo "FAIL: missing: $1"; fail=1; }; }
 hasnt() { ! grep -qF -- "$1" <<<"$out" || { echo "FAIL: unexpected: $1"; fail=1; }; }
-has "2 changed, 1 added, 3 removed"
+has "4 changed, 1 added, 3 removed"
 has '`docs/a.md#changing-one` (changed)'
 has '- `docs/a.md#brand-new-thing-v2`'   # unmapped; slug drops punctuation
 has '`docs/a.md#going-away` (removed)'
@@ -19,4 +19,7 @@ has '`docs/a.md#going-away`'
 has 'r1.md`: `docs/a.md#going-away`'           # dangling anchor
 has 'r2.md`: `docs/gone.md`'                   # dangling file-level
 hasnt 'not-a-heading'                          # fenced heading ignored
+has '`docs/a.md#child-detail_x` (changed)'   # backticks dropped, underscore kept
+has '`docs/a.md#dup_1` (changed)'   # duplicate slug suffix
+has '**`tests/fixtures/docs_diff/skills/s1/references/r4.md`**'
 [ $fail -eq 0 ] && echo "docs_diff: OK" || { echo "$out"; exit 1; }

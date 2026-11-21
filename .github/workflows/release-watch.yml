@@ -37,7 +37,9 @@ jobs:
             echo "proceed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if gh issue list --state open --limit 200 --json title -q '.[].title' | grep -Fxq -- "$title"; then
+          # Capture first: a pipe into grep -q can SIGPIPE gh under pipefail and look like "no match".
+          titles="$(gh issue list --state open --limit 200 --json title -q '.[].title')"
+          if grep -Fxq -- "$title" <<<"$titles"; then
             echo "Open issue \"$title\" exists, skipping."
             echo "proceed=false" >> "$GITHUB_OUTPUT"
             exit 0
@@ -61,11 +63,13 @@ jobs:
           fail=0
           check() {  # check <label> <cmd...>: run, log, record pass/fail
             local label="$1"; shift
-            if "$@" > "log-${label// /_}.txt" 2>&1; then
+            local log="log-$RANDOM-$$.txt"
+            if "$@" > "$log" 2>&1; then
               echo "- PASS: $label" >> test-summary.md
             else
               echo "- FAIL: $label" >> test-summary.md
               fail=1
+              { echo; echo "<details><summary>$label log (tail)</summary>"; echo; echo '```'; tail -n 40 "$log"; echo '```'; echo; echo "</details>"; echo; } >> test-summary.md
             fi
           }
           docker pull "$FT_IMAGE" || { echo "- FAIL: docker pull $FT_IMAGE" >> test-summary.md; exit 1; }
@@ -74,21 +78,18 @@ jobs:
           check "check_cli" scripts/dpy.sh scripts/check_cli.py
           check "strategies (backtest, lookahead, recursive)" bash tests/run_all.sh
           check "hyperopt" bash tests/run_hyperopt.sh HyperoptExample --image "$FT_IMAGE"
-          # Keep the tail of each failing log for the issue.
-          for f in log-*.txt; do
-            lbl="${f#log-}"; lbl="${lbl%.txt}"
-            if grep -q "FAIL: ${lbl//_/ }" test-summary.md; then
-              { echo; echo "<details><summary>${lbl//_/ } log (tail)</summary>"; echo; echo '```'; tail -n 40 "$f"; echo '```'; echo; echo "</details>"; } >> test-summary.md
-            fi
-          done
           exit "$fail"
 
       - name: Diff docs
         if: steps.detect.outputs.proceed == 'true'
         env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           OLD_TAG: ${{ steps.detect.outputs.current }}
           NEW_TAG: ${{ steps.detect.outputs.latest }}
-        run: python3 scripts/docs_diff.py --old "$OLD_TAG" --new "$NEW_TAG" --skills skills > docs-diff.md
+        run: |
+          if ! python3 scripts/docs_diff.py --old "$OLD_TAG" --new "$NEW_TAG" --skills skills > docs-diff.md; then
+            echo "Docs diff failed, see the workflow run ()." > docs-diff.md
+          fi
 
       - name: Open issue
         if: steps.detect.outputs.proceed == 'true'
@@ -106,15 +107,25 @@ jobs:
             echo
             if [ -s test-summary.md ]; then cat test-summary.md; else echo "Tests did not run (see workflow run)."; fi
             echo
-            cat docs-diff.md
+          } > body-head.md
+          {
             echo
             echo "Workflow run: $RUN_URL"
             echo
             echo "To refresh: update the affected reference files, bump \`freqtrade-version.json\`, \`tests/strategies.json\` image tags and each SKILL.md footer, then open a reviewed PR."
-          } > body-full.md
-          if [ "$(wc -m < body-full.md)" -gt "$limit" ]; then
-            { head -c "$limit" body-full.md; printf '\n\n_Truncated, see the workflow run for the full report._\n'; } > body.md
+          } > body-foot.md
+          # Only the docs diff is truncated, so the summary and footer always survive.
+          budget=$(( limit - $(wc -c < body-head.md) - $(wc -c < body-foot.md) - 200 ))
+          if [ "$(wc -c < docs-diff.md)" -gt "$budget" ]; then
+            head -c "$budget" docs-diff.md | sed '$d' > diff-cut.md   # drop the partial last line
+            opened=$(grep -c '^<details' diff-cut.md || true)
+            closed=$(grep -c '^</details>' diff-cut.md || true)
+            fences=$(grep -c '^```' diff-cut.md || true)
+            [ $(( fences % 2 )) -eq 1 ] && echo '```' >> diff-cut.md
+            [ "$opened" -gt "$closed" ] && printf '\n</details>\n' >> diff-cut.md
+            printf '\n_Docs diff truncated, see the workflow run for the full report._\n' >> diff-cut.md
           else
-            cp body-full.md body.md
+            cp docs-diff.md diff-cut.md
           fi
+          cat body-head.md diff-cut.md body-foot.md > body.md
           gh issue create --title "Freqtrade $NEW_TAG released: refresh skills" --body-file body.md

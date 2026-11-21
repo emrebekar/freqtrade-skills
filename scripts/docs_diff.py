@@ -29,8 +29,9 @@ def slugify(text):
 
 
 def split_sections(md_text):
-    """Return {slug: body_text}; duplicate slugs get _1, _2 like mkdocs. Text before the first heading is skipped."""
-    sections, counts, slug, body, in_fence = {}, defaultdict(int), None, [], False
+    """Return ({slug: body}, {slug: [ancestor slugs]}); duplicate slugs get _1, _2 like mkdocs. Text before the first heading is skipped."""
+    sections, parents, counts, stack = {}, {}, defaultdict(int), []
+    slug, body, in_fence = None, [], False
 
     def flush():
         if slug is not None:
@@ -42,26 +43,33 @@ def split_sections(md_text):
         m = None if in_fence else HEADING_RE.match(line)
         if m:
             flush()
+            level = len(m.group(1))
             base = slugify(m.group(2)) or "section"
             n = counts[base]
             counts[base] += 1
             slug, body = (base if n == 0 else f"{base}_{n}"), []
+            while stack and stack[-1][0] >= level:
+                stack.pop()
+            parents[slug] = [s for _, s in stack]
+            stack.append((level, slug))
         else:
             body.append(line)
     flush()
-    return sections
+    return sections, parents
 
 
 def load_tree(docs_root):
-    """Return ({'docs/<file>.md#slug': body}, {'docs/<file>.md', ...})."""
+    """Return ({key: body}, {files}, {key: [ancestor keys]})."""
     root = Path(docs_root)
-    sections, files = {}, set()
+    sections, files, ancestors = {}, set(), {}
     for p in sorted(root.rglob("*.md")):
         rel = "docs/" + p.relative_to(root).as_posix()
         files.add(rel)
-        for slug, body in split_sections(p.read_text(encoding="utf-8", errors="replace")).items():
+        secs, parents = split_sections(p.read_text(encoding="utf-8", errors="replace"))
+        for slug, body in secs.items():
             sections[f"{rel}#{slug}"] = body
-    return sections, files
+            ancestors[f"{rel}#{slug}"] = [f"{rel}#{a}" for a in parents[slug]]
+    return sections, files, ancestors
 
 
 def clone_docs(tag, repo_url, dest):
@@ -83,14 +91,15 @@ def read_sources(skills_dir):
     return refs
 
 
-def cites(cited, key):
-    """True when a Source entry covers section key (file-level entries cover the whole file)."""
-    return any(key == c or ("#" not in c and key.startswith(c + "#")) for c in cited)
+def cites(cited, key, anc):
+    """True when a Source entry covers section key: same anchor, an ancestor heading, or a file-level entry."""
+    return any(c == k or ("#" not in c and k.startswith(c + "#")) for c in cited for k in [key, *anc.get(key, [])])
 
 
 def build_report(old, new, refs):
-    old_s, _ = old
-    new_s, new_f = new
+    old_s, _, old_anc = old
+    new_s, new_f, new_anc = new
+    anc = {**old_anc, **new_anc}
     added = sorted(k for k in new_s if k not in old_s)
     removed = sorted(k for k in old_s if k not in new_s)
     changed = sorted(k for k in new_s if k in old_s and new_s[k] != old_s[k])
@@ -102,7 +111,7 @@ def build_report(old, new, refs):
     for ref, cited in refs.items():
         rows = [f"- `{k}` ({kind})" for kind, keys in
                 (("changed", changed), ("added", added), ("removed", removed))
-                for k in keys if cites(cited, k)]
+                for k in keys if cites(cited, k, anc)]
         if rows:
             hits += 1
             out += [f"**`{ref}`**", *rows, ""]
@@ -120,7 +129,7 @@ def build_report(old, new, refs):
     out.append("")
 
     cited_all = [c for v in refs.values() for c in v]
-    unmapped = [k for k in changed + added + removed if not cites(cited_all, k)]
+    unmapped = [k for k in changed + added + removed if not cites(cited_all, k, anc)]
     out += [f"<details><summary>{len(unmapped)} changed sections not cited by any reference</summary>", ""]
     out += [f"- `{k}`" for k in unmapped] + ["", "</details>", ""]
     return "\n".join(out)
