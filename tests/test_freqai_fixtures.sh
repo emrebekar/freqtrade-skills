@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Exercises run_checks' --freqai lookahead rule (tests/check_results.py) two ways:
-# 1. synthetic CSV rows (fast): derived/&-target columns pass; any other flagged column or biased signal fails.
+# 1. synthetic CSV rows (fast): &-target plus FreqAI output columns pass, FreqAI outputs without any & column fail; any other flagged column or biased signal fails.
 # 2. real lookahead-analysis on FreqAI fixtures (slow, ~90 s each): flagged = must fail, missed = known false negative, must pass.
 set -uo pipefail
 cd "$(dirname "$0")/.."
@@ -34,6 +34,11 @@ rt() { # name expect(pass|fail) flag rows...
 rt only_targets pass --freqai "&-s_close -111.5% -59.6%"
 rt target_and_bad_feature fail --freqai "&-s_close -111.5% -59.6%" "%%-rsi 2.000% 0.000%"
 rt target_and_good_feature pass --freqai "&-s_close -111.5% -59.6%" "%%-rsi 0.100% 0.000%"
+printf '%s
+S.py,S,True,20,0,0,"do_predict,enter_long,exit_long"
+' "$HDR" > "$OUT/derived_only.csv"
+msg=$(run --entrypoint python "$IMAGE" -I tests/check_results.py lookahead "$OUT/derived_only.csv" --freqai); rc=$?
+if [ $rc -ne 0 ]; then echo "synthetic derived_only: OK as expected (fail) - $msg"; else echo "synthetic derived_only: FAIL (expected fail) - $msg"; fail=1; fi
 rt targets_without_flag fail "" "&-s_close -111.5% -59.6%"
 
 [ "${SKIP_RUNS:-0}" = 1 ] && exit $fail

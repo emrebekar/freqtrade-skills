@@ -1,4 +1,4 @@
-# Known-bad fixture: a FEATURE peeks at the next candle (leaky %-feature). Must FAIL run_checks --freqai.
+# Known-bad fixture: a FEATURE peeks at the next candle (leaky %-feature). Known FALSE NEGATIVE: lookahead-analysis does not flag it, so run_checks --freqai passes (tests/test_freqai_fixtures.sh expects pass).
 from pandas import DataFrame
 
 import talib.abstract as ta

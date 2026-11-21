@@ -11,7 +11,7 @@ FreqAI trains a model on your features to predict targets (labels) you define, r
 Rules:
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives (docs: "not biased and can safely be ignored"). That is the only blanket exception: pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each, never silently ignore. Read "Validation gate" below: both commands are much weaker on FreqAI strategies than on plain ones.
 - Keep `dry_run: true`. Live trading is the user's separate, explicit decision.
-- The `&` prefix on a target is not a free pass: every flagged column must be an `&` target or an output derived from one. Any other flagged column is a finding to explain.
+- The `&` prefix on a target is not a free pass. Docs: `set_freqai_targets()` columns are false positives. Repo-observed on 2026.10 (a repo rule, not a docs rule): FreqAI's own outputs are flagged too, exact list `do_predict`, `DI_values`, `enter_long`, `enter_short`, `exit_long`, `exit_short`, `enter_tag`, `exit_tag` (only `do_predict`, `enter_long`, `exit_long`, `enter_tag`, `exit_tag` were observed; the rest are symmetric, unobserved), and they are acceptable only when at least one `&` column is also flagged and the biased entry/exit signal counts are 0. Any other flagged column, even one computed from predictions (for example the docs' `target_roi`), is a finding to explain.
 - Features must not use future data. Backtesting computes `feature_engineering_*()` once over the whole training range (docs), so a feature with `shift(-n)` leaks. Only labels may look ahead.
 - Same `identifier` means saved predictions are reused: after any change to features or labels use a new `identifier` (docs), or delete the models folder.
 - Never load model files you did not train yourself (docs security notice: loading saved models can run untrusted code).
@@ -23,7 +23,7 @@ Rules:
 2. Write the `freqai` config block (references/config.md) and a strategy with the required methods (references/feature-engineering.md).
 3. Pick a model with `list-freqaimodels` (references/models.md); start small (one pair, few features, small model) and check training works before widening.
 4. Backtest with `--freqaimodel` (references/running.md). Read the training log lines: windows, data points, NaN drops, features count.
-5. Run `lookahead-analysis` and `recursive-analysis`, read the result with the FreqAI caveats below, and review feature code against the leakage list by hand.
+5. Run `lookahead-analysis` and `recursive-analysis`, read the result with the FreqAI caveats below, and review by hand all `feature_engineering_*()` code, `populate_entry_trend()`, `populate_exit_trend()` and any code after `self.freqai.start()` against the leakage list.
 6. Evaluate out of sample: a time range after the one you tuned on, with a fresh `identifier`, and report trade counts. Only then suggest a dry run.
 
 ## Setup
@@ -80,7 +80,7 @@ Required: `startup_candle_count`, `populate_indicators()` calling `self.freqai.s
 
 ## Leakage and self-deception checklist
 
-1. A feature that uses `shift(-n)`, a whole-column statistic, `iloc`, or a resample/merge that peeks forward leaks. Labels are the only place for future data.
+1. A feature, entry/exit or post-`freqai.start()` line that uses `shift(-n)`, a whole-column statistic, `iloc`, or a resample/merge that peeks forward leaks. Labels are the only place for future data.
 2. The `lookahead-analysis` of a FreqAI strategy flags all target columns, `do_predict` and the enter/exit columns, and in tests a leaky `%` feature gave the same result as a clean strategy (false negative, observed). A `%%` feature does show up, but so does a clean one, so it is no better as a test. Review feature code by hand.
 3. `recursive-analysis` lists only the `&` columns for a FreqAI strategy, with large percentages that come from different training data per startup count, not from indicator recursion (observed). It cannot assess feature recursion.
 4. Backtest trains on past data only per window, but retraining cadence in live differs (continuous, queue of pairs, model age discrepancy); a model that is hours old trades differently than a fresh one (docs: `expiration_hours`).
@@ -93,9 +93,9 @@ Required: `startup_candle_count`, `populate_indicators()` calling `self.freqai.s
 Before reporting a FreqAI strategy as done, show the user:
 
 1. The training log: windows, number of features and data points, no unexpected NaN drops, the model name and `identifier`.
-2. `lookahead-analysis`: no biased entry/exit signals; flagged columns limited to `&` targets and outputs derived from them (`do_predict`, `DI_values`, `enter_*`/`exit_*`). The only blanket exception is FreqAI `set_freqai_targets()` columns; pairlist-dependent logic and limit orders with `custom_*_price` can also give documented false positives, each explained, never silently ignored. Any other flagged column (for example a `%%` feature) is an open finding.
+2. `lookahead-analysis`: 0 biased entry/exit signals; flagged columns limited to the `set_freqai_targets()` columns (`&`, docs) and, repo-observed, FreqAI's own outputs (`do_predict`, `DI_values`, `enter_long`, `enter_short`, `exit_long`, `exit_short`, `enter_tag`, `exit_tag`), only when an `&` column is also flagged. The only blanket docs exception is FreqAI `set_freqai_targets()` columns; pairlist-dependent logic and limit orders with `custom_*_price` can also give documented false positives, each explained, never silently ignored. Any other flagged column (a `%%` feature, a column computed from predictions) is an open finding.
 3. `recursive-analysis`: run it, and say that for FreqAI it only lists model outputs and does not assess the features. The repo harness prints `NOT ASSESSED` for this case rather than a pass. To test feature recursion, compute the same indicators in a plain strategy and run recursive-analysis there (a repo suggestion, not tested).
-4. A manual review of every `feature_engineering_*()` line against the leakage checklist. The tools above cannot do this for you.
+4. A manual review of every `feature_engineering_*()` line, `populate_entry_trend()`, `populate_exit_trend()` and any code after `self.freqai.start()` against the leakage checklist. Under `--freqai` an inline leak in signal code is caught only by the biased entry/exit signal counts, and the tools cannot see `%` features at all.
 5. An out-of-sample backtest with a fresh `identifier`, with trade counts, and the honest limits: backtest retraining is simulated, fills are idealized, live retraining behavior was not tested.
 
 Only then suggest a dry run. Live trading is the user's separate, explicit decision.

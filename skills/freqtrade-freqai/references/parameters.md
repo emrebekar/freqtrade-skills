@@ -1,6 +1,6 @@
 Source: docs/freqai-parameter-table.md
 Source: docs/freqai-feature-engineering.md#outlier-detection
-Source: docs/freqai.md#important-dataframe-key-patterns
+Source: docs/freqai-configuration.md#important-dataframe-key-patterns
 
 # FreqAI parameter reference
 
@@ -77,10 +77,10 @@ All of these remove or flag points unlike the training data. They change what th
 
 ## Docs inconsistencies collected
 
-- `expired_hours` (freqai.md, freqai-running.md) vs `expiration_hours` (parameter table, code).
-- `feature_engineering_*` signatures with and without `metadata` (freqai.md vs freqai-feature-engineering.md).
+- `expired_hours` (freqai-configuration.md:166 dataframe key table, freqai-running.md:15) vs `expiration_hours` (parameter table, code). The table also types it "positive integer" while the running page example uses 0.5.
+- `feature_engineering_*` signatures with and without `metadata` (freqai-configuration.md vs freqai-feature-engineering.md).
 - `purge_old_models: true` (running) vs an integer default 2 (table).
-- Feature count formula uses `include_shifted_candles` as a factor; observed `1 + include_shifted_candles`.
+- Feature count formula uses `include_shifted_candles` as a factor (observed `1 + include_shifted_candles`) and counts only the corr pairs listed, while the base pair is also a feature source (observed 2 pairs for 1 listed: undercount).
 - TensorBoard port 6060 (running) vs 6006 (RL page).
 - "Eight examples" of models vs ten usable in the image; CatBoost mentioned, not present.
 - `conv_width` default 2 (docs) vs 1 (schema).

@@ -1,7 +1,7 @@
-Source: docs/freqai.md#building-a-freqai-strategy
-Source: docs/freqai.md#important-dataframe-key-patterns
-Source: docs/freqai.md#setting-the-startup_candle_count
-Source: docs/freqai.md#creating-a-dynamic-target-threshold
+Source: docs/freqai-configuration.md#building-a-freqai-strategy
+Source: docs/freqai-configuration.md#important-dataframe-key-patterns
+Source: docs/freqai-configuration.md#setting-the-startup_candle_count
+Source: docs/freqai-configuration.md#creating-a-dynamic-target-threshold
 Source: docs/freqai-feature-engineering.md#defining-the-features
 Source: docs/freqai-feature-engineering.md#gain-finer-control-over-feature_engineering_-functions-with-metadata
 Source: docs/freqai-feature-engineering.md#returning-additional-info-from-training
@@ -19,7 +19,7 @@ Source: docs/freqai-feature-engineering.md#building-the-data-pipeline
 | `feature_engineering_standard(dataframe, metadata, **kwargs)` | once, on the base timeframe, last | features that must not expand (hour of day) |
 | `set_freqai_targets(dataframe, metadata, **kwargs)` | required | labels, `&`-prefixed |
 
-All four are optional except `set_freqai_targets()`. Docs conflict on signatures: the strategy page (freqai.md) shows `feature_engineering_expand_all(self, dataframe, period, **kwargs)` and the others without `metadata`, while the feature engineering page shows `metadata` in each. Both work because of `**kwargs` (the tested code below uses the `metadata` form). Docs: `metadata` has `pair`, `tf` (timeframe), `period`; use it to build a feature only for some timeframes, for example `if metadata["tf"] == "1h":`.
+All four are optional except `set_freqai_targets()`. Docs conflict on signatures: the strategy page (freqai-configuration.md#building-a-freqai-strategy) shows `feature_engineering_expand_all(self, dataframe, period, **kwargs)` and the others without `metadata`, while the feature engineering page shows `metadata` in each. Both work because of `**kwargs` (the tested code below uses the `metadata` form). Docs: `metadata` has `pair`, `tf` (timeframe), `period`; use it to build a feature only for some timeframes, for example `if metadata["tf"] == "1h":`.
 
 Number of features (docs): written features x `len(include_timeframes)` x `len(include_corr_pairlist)` x (1 + `include_shifted_candles`) x `len(indicator_periods_candles)` for `expand_all`; without the period factor for `expand_basic`; `standard` is not expanded. The docs formula counts shifted candles as a factor of `include_shifted_candles`; observed in the tested config (shift 1) the count is `1 + shift`, because the unshifted feature stays: 5 expand_all features x 1 period x 2 timeframes x 2 pairs x 2 = 40, plus 2 expand_basic x 2 x 2 x 2 = 16, plus 2 standard = 58, matching the log line `Training model on 58 features`.
 

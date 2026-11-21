@@ -12,9 +12,10 @@ import sys
 # strategy's own startup_candle_count column.
 RECURSIVE_MAX_VARIANCE_PCT = 0.5
 STRATEGY_COL = "(from strategy)"
-# --freqai: columns lookahead-analysis flags only because they derive from the targets (observed on 2026.10,
-# docs name only the set_freqai_targets() columns): FreqAI outputs and the signals built from them.
-# Signal bias itself is still caught by the biased_entry/exit_signals counts.
+# --freqai: besides the docs-named set_freqai_targets() columns (&-prefixed), lookahead-analysis flags FreqAI outputs and the
+# signal columns built from them. Observed on 2026.10: do_predict, enter_long, exit_long, enter_tag, exit_tag.
+# enter_short, exit_short, DI_values are symmetric but unobserved. Ignored ONLY when at least one & column is also
+# flagged (they differ because the model is retrained per slice); biased_entry/exit_signals counts still fail.
 FREQAI_DERIVED = {"do_predict", "DI_values", "enter_long", "enter_short", "exit_long", "exit_short", "enter_tag", "exit_tag"}
 
 
@@ -26,7 +27,8 @@ def lookahead(path, freqai):
     row = rows[0]
     inds = [i for i in row["biased_indicators"].split(",") if i]
     if freqai:  # &-prefixed targets: documented false positives; FREQAI_DERIVED: observed, see above
-        inds = [i for i in inds if not i.startswith("&") and i not in FREQAI_DERIVED]
+        has_target = any(i.startswith("&") for i in inds)
+        inds = [i for i in inds if not i.startswith("&") and not (has_target and i in FREQAI_DERIVED)]
     entry, exit_ = int(row["biased_entry_signals"]), int(row["biased_exit_signals"])
     biased = entry > 0 or exit_ > 0 or (bool(inds) if freqai else row["has_bias"] == "True")
     detail = f"entry={entry} exit={exit_} indicators={','.join(inds) or '-'}"
