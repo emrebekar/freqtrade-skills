@@ -1,5 +1,7 @@
 name: probe
-on: workflow_dispatch
+on:
+  push:
+    branches: [fix/ci-linux]
 permissions:
   contents: read
 jobs:
