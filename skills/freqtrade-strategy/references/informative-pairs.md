@@ -10,7 +10,7 @@ Use a higher timeframe (or another pair) as extra context. Two supported ways, e
 1. `@informative("1h")` decorator: shortest, columns appear in the dataframe before `populate_indicators()` runs.
 2. `DataProvider` + `merge_informative_pair()`: full control, needed when one informative pair must use data from another.
 
-Do not use both for the same timeframe in one strategy: the decorator already created `date_1h`, `open_1h`, ... and a manual merge of the same timeframe would re-create those column names; pick one pattern per timeframe. The two example strategies produce identical backtest results (120 trades on the test data).
+Do not mix both patterns for the same informative timeframe in one strategy: combining them is not documented and not tested here. The two example strategies each use one pattern and produce identical backtest results (120 trades on the test data).
 
 ## Rules
 

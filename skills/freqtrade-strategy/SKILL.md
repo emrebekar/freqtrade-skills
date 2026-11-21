@@ -70,7 +70,7 @@ The exit signal: a column set to `1` (with a tag) for rows where the condition h
 - Informative timeframes must be at least the strategy timeframe; merge only through `@informative` or `merge_informative_pair`, never a plain `merge`. `@informative` method names must be unique.
 - `orderbook()`, `ticker()`, `funding_rate()` and trade-history calls return live values; do not use them for signals without a run-mode guard, and expect backtests to differ.
 - Config values (`stoploss`, `minimal_roi`, `timeframe`, ...) override strategy values.
-- Always set a stoploss. With leverage L, a stoploss of x triggers on a price move of x / L; make sure it triggers before liquidation.
+- Always set a stoploss. Stoploss is leverage-adjusted (at 10x, -0.10 triggers on a 1% move). Compare `trade.liquidation_price` with the stop price rather than assuming the stop fires before liquidation.
 
 ## Commands
 

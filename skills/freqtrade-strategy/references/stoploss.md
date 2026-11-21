@@ -55,7 +55,7 @@ order_types = {
 
 ## Stoploss and leverage
 
-Stoploss is the risk on the trade measured on your own capital. A 10% stoploss at 10x leverage triggers on a 1% price move; at 2x it triggers on a 5% move. With leverage, check that the stoploss is reachable before liquidation: with leverage 2 a stoploss of -0.5 would be liquidated first. See leverage-shorting.md.
+Stoploss is the risk on the trade measured on your own capital, and it is leverage-adjusted: a 10% stoploss at 10x leverage triggers on a 1% price move (docs). Do not reason out whether the stop fires before liquidation by hand; compare `trade.liquidation_price` with the stop price (`trade.stop_loss`, `trade.stoploss_or_liquidation`) in a callback or on an open trade. See leverage-shorting.md.
 
 ## Changing the stoploss of open trades
 

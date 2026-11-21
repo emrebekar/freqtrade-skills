@@ -119,7 +119,7 @@ In ShortExample the exits use `crossed_above/below(rsi, 50)` so that `exit_long`
 minimal_roi = {"60": 0.01, "30": 0.02, "0": 0.04}
 ```
 
-That means: exit at 4% any time, at 2% after 30 minutes, at 1% after 60 minutes. A key `"40": 0.0` means "exit when not losing after 40 minutes". `minimal_roi = {}` disables ROI. Time is counted from `trade.open_date` (when the first order was placed), even if that order fills late. `minimal_roi` and `stoploss` in the config override the strategy values.
+That means: exit at 4% any time, at 2% after 30 minutes, at 1% after 60 minutes. A key `"40": 0.0` means "exit when not losing after 40 minutes". `minimal_roi = {}` disables ROI. Per the docs (minimal ROI), `minimal_roi` takes `trade.open_date` as reference: the time the first order was placed, even if that order fills late. `minimal_roi` and `stoploss` in the config override the strategy values.
 
 ROI times in candles instead of minutes (docs example, not tested here):
 
