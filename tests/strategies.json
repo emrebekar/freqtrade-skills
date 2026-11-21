@@ -1,0 +1,3 @@
+[
+  {"strategy": "SampleSmoke", "config": "tests/config.test.json", "image": "freqtradeorg/freqtrade:2026.10", "freqai": false}
+]
