@@ -78,6 +78,9 @@ jobs:
         run: |
           # shellcheck disable=SC2086
           bash tests/run_checks.sh "$STRATEGY" $ARGS
+      - name: show logs on failure
+        if: failure()
+        run: for f in tests/out/*/*.log; do echo "::group::$f"; tail -n 60 "$f"; echo "::endgroup::"; done
 
   negative:
     runs-on: ubuntu-latest
