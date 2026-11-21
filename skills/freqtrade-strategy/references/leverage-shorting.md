@@ -59,6 +59,7 @@ The signals of this strategy are in signals.md (section "Short signals").
 
 - All profit calculations, stoploss and ROI include leverage: stake 100 at 3x is a 300 position, and a 10% stoploss at 10x triggers on a 1% move.
 - Choose a stoploss that triggers well before liquidation. Do not reason it out by hand: compare `trade.liquidation_price` with the stop price (`trade.stop_loss`) on a real or dry-run trade.
+- Docs conflict: leverage.md (danger box) says "With a leverage of 2, a stoploss of 0.5 (50%) would be too low, and these trades would be liquidated before reaching that stoploss", while strategy-callbacks.md and stoploss.md describe a leverage-adjusted stoploss (at 10x, -0.1 triggers on a 1% move). Do not reason it out. After a backtest or dry run, compare `trade.liquidation_price` with the stop price and keep the stop well inside liquidation.
 - `liquidation_buffer` (default `0.05`) puts a safety margin between the liquidation price and the stoploss: `freqtrade_liquidation_price = liquidation_price +/- (abs(open_rate - liquidation_price) * liquidation_buffer)` (+ for long, - for short). Setting it to 0 or very low likely causes liquidations and liquidation fees, which freqtrade does not track; use `stoploss_on_exchange` then if supported.
 - `liquidation_warn_ratio` (default `0.2`, `0` disables) sends a best-effort notification near the liquidation stop. It does not replace a stoploss.
 - Isolated margin: adding funds to the account does not move an isolated position's liquidation stop.
