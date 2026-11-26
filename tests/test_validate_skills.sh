@@ -8,7 +8,7 @@ fail=0
 
 out=$($PY $V --root tests/fixtures/skills_bad --agents tests/fixtures/skills_good/AGENTS.md 2>&1); rc=$?
 [ "$rc" -eq 1 ] || { echo "FAIL bad root: exit $rc, want 1"; fail=1; }
-for pat in "bad-name/SKILL.md: name .*invalid" "description missing" "references/missing.md" "AGENTS" "footer-not-last/SKILL.md: footer" "skills_bad/good: not listed"; do
+for pat in "bad-name/SKILL.md: name .*invalid" "description missing" "references/missing.md" "AGENTS" "footer-not-last/SKILL.md: footer" "skills_bad/good: not listed" "freqtrade:latest. is not a pinned" "freqtrade:(no tag). is not a pinned"; do
   echo "$out" | grep -q "$pat" || { echo "FAIL bad root: no '$pat' error"; fail=1; }
 done
 

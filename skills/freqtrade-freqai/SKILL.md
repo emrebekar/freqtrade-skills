@@ -28,7 +28,7 @@ Rules:
 
 ## Setup
 
-FreqAI needs extra Python packages. Docker image tag with them (docs name the `:freqai` tag; `2026.10_freqai` was pulled and used in this repo's tests): `freqtradeorg/freqtrade:2026.10_freqai` (LightGBM, XGBoost, scikit-learn). Docs: the torch tag (`stable_freqaitorch`) for PyTorch and the RL tag (`stable_freqairl`) for reinforcement learning (not pulled or run here). Native install: answer yes to the FreqAI question in `setup.sh`, or `pip install -r requirements-freqai.txt`. In the `_freqai` image the PyTorch and RL models log "Could not import ... No module named 'torch'" (observed) and are absent from `list-freqaimodels`.
+FreqAI needs extra Python packages. Docker image tag with them (docs name the `:freqai` tag; `2026.10_freqai` was pulled and used in this repo's tests): `freqtradeorg/freqtrade:2026.10_freqai` (LightGBM, XGBoost, scikit-learn). For PyTorch use `freqtradeorg/freqtrade:2026.10_freqaitorch`, for reinforcement learning `freqtradeorg/freqtrade:2026.10_freqairl` (the docs name the floating `stable_freqaitorch`/`stable_freqairl` tags; pin the release form; neither was pulled or run here). Native install: answer yes to the FreqAI question in `setup.sh`, or `pip install -r requirements-freqai.txt`. In the `_freqai` image the PyTorch and RL models log "Could not import ... No module named 'torch'" (observed) and are absent from `list-freqaimodels`.
 
 ```bash
 freqtrade list-freqaimodels --one-column

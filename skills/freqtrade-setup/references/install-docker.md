@@ -23,7 +23,23 @@ docker compose run --rm freqtrade new-config --config user_data/config.json
 
 All commands are run from the directory containing `docker-compose.yml`. The configuration is `user_data/config.json`. Strategies go into `user_data/strategies/`. The compose file's `command` section chooses the strategy and arguments of the running bot (SampleStrategy by default); edit it to use your strategy class name.
 
-Pinned image tags used by this repo's tests: `freqtradeorg/freqtrade:2026.10` and `freqtradeorg/freqtrade:2026.10_freqai`. The compose file from the `stable` branch uses its own image tag; check it matches the version you want.
+## Pin the image to a release tag
+
+Always use the release these skills were tested on: `freqtradeorg/freqtrade:2026.10`, or a flavour of it (`2026.10_plot`, `2026.10_freqai`, `2026.10_freqaitorch`, `2026.10_freqairl`, `2026.10_pi`). Release tags match the GitHub releases (`gh release list -R freqtrade/freqtrade`).
+
+Never use these tags:
+- `latest`: on Docker Hub it is the same image as `develop`, an unreleased build (observed 2026-11-25: identical digests). An image name without a tag pulls `latest`.
+- `develop`, `develop_*`: unreleased builds.
+- `stable`, `stable_*`: move to each new release without notice, so results stop being reproducible and stop matching these skills.
+
+The official `docker-compose.yml` uses the floating `stable` tag (the `develop` lines are commented out). After downloading it, change that line to the pinned tag:
+
+```bash
+sed -i 's#freqtrade:stable#freqtrade:2026.10#' docker-compose.yml
+docker compose run --rm freqtrade --version
+```
+
+On macOS use `sed -i ''`. The version check must print `Freqtrade Version:	freqtrade 2026.10` (observed). To run a newer release, pin that exact `YYYY.M` tag instead and tell the user that commands and sample outputs in these skills were checked on 2026.10.
 
 ## Running commands
 
@@ -40,7 +56,7 @@ docker compose pull
 Commands that need no authentication, such as `list-pairs`, can also run without compose:
 
 ```bash
-docker run --rm freqtradeorg/freqtrade:stable list-pairs --exchange binance --quote BTC --print-json
+docker run --rm freqtradeorg/freqtrade:2026.10 list-pairs --exchange binance --quote BTC --print-json
 ```
 
 Logs go to `user_data/logs/freqtrade.log`; the database is `user_data/tradesv3.sqlite`. Follow live logs with `docker compose logs -f` (text, not a freqtrade command).
@@ -78,7 +94,7 @@ If the strategy needs packages not in the image, build a custom image: create a 
 
 ## Plotting
 
-`plot-dataframe` and `plot-profit` need the `*_plot` image flavour; change the image in `docker-compose.yml` accordingly. Output goes to `user_data/plot`.
+`plot-dataframe` and `plot-profit` need the `_plot` image flavour; change the image in `docker-compose.yml` to `freqtradeorg/freqtrade:2026.10_plot`. Output goes to `user_data/plot`.
 
 ## Troubleshooting (Windows)
 

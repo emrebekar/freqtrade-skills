@@ -9,6 +9,9 @@ ALLOWED_KEYS = {"name", "description", "license"}
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 LINK_RE = re.compile(r"(?<!!)\[[^\]]*\]\(([^)\s]+)[^)]*\)")
 FOOTER_RE = re.compile(r"^Built from Freqtrade docs \S+ \(\S+\)\. Source: https://github\.com/freqtrade/freqtrade/tree/\S+/docs\s*$", re.M)
+# Docker images must name a release tag (YYYY.M plus optional flavor); latest/develop*/stable or no tag drift from the docs.
+IMAGE_RE = re.compile(r"freqtradeorg/freqtrade(?::([\w.-]*\w))?")
+RELEASE_TAG_RE = re.compile(r"^\d{4}\.\d{1,2}(_[a-z]+)?$")
 FENCE_RE = re.compile(r"^(```|~~~).*?^\1[ \t]*$", re.M | re.S)
 MAX_LINES, MAX_NAME, MAX_DESC = 300, 64, 1024
 
@@ -83,6 +86,9 @@ def check_skill(d, agents_text):
                 continue
             if not (md_file.parent / target.split("#")[0]).exists():
                 errs.append(f"{md_file}: broken link '{target}'")
+        for tag in IMAGE_RE.findall(body):
+            if not RELEASE_TAG_RE.match(tag):
+                errs.append(f"{md_file}: image 'freqtradeorg/freqtrade:{tag or '(no tag)'}' is not a pinned release tag")
         if md_file != md and not body.startswith("Source: "):
             errs.append(f"{md_file}: first line must start with 'Source: '")
     if not re.search(rf"(?<![\w-]){re.escape(d.name)}(?![\w-])", agents_text):

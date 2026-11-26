@@ -3,7 +3,7 @@ Source: docs/freqai-parameter-table.md#reinforcement-learning-parameters
 
 # Reinforcement learning (documented, UNTESTED)
 
-Nothing on this page was run in this repo: the `2026.10_freqai` image cannot import `ReinforcementLearner` (observed: `No module named 'torch'`, status `LOAD FAILED` in `list-freqaimodels`), and the RL image (docs tag `stable_freqairl`) was not pulled. Treat every statement as the docs' claim. Verify on your setup before relying on it.
+Nothing on this page was run in this repo: the `2026.10_freqai` image cannot import `ReinforcementLearner` (observed: `No module named 'torch'`, status `LOAD FAILED` in `list-freqaimodels`), and the RL image (`2026.10_freqairl`; docs tag `stable_freqairl`) was not pulled. Treat every statement as the docs' claim. Verify on your setup before relying on it.
 
 ## What it is (docs)
 

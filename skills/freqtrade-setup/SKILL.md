@@ -11,6 +11,7 @@ Get from nothing to a working user directory, a dry-run config, a strategy file 
 Rules for every step below:
 - Start with `dry_run: true`. Never put exchange API keys in a config you commit or share (see the freqtrade-config skill).
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass on it. The only blanket exception is FreqAI `set_freqai_targets()` columns (targets are expected to look ahead). Pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each to the user, never silently ignore.
+- Docker: pin the image to the release tag `freqtradeorg/freqtrade:2026.10` (or its `_plot`/`_freqai`/`_freqaitorch`/`_freqairl` flavour). Never use `latest` (it is the unreleased `develop` build), `develop*`, `stable*` or an image without a tag. Details: references/install-docker.md.
 - Backtests need data: download it first (below) and include the strategy's `startup_candle_count` extra candles before the timerange start.
 
 ## 1. Install
@@ -23,8 +24,12 @@ Docker quick start:
 mkdir ft_userdata
 cd ft_userdata/
 curl https://raw.githubusercontent.com/freqtrade/freqtrade/stable/docker-compose.yml -o docker-compose.yml
+sed -i 's#freqtrade:stable#freqtrade:2026.10#' docker-compose.yml
 docker compose pull
+docker compose run --rm freqtrade --version
 ```
+
+The downloaded compose file uses the floating `stable` tag; the `sed` line pins it (macOS: `sed -i ''`). `--version` must report `freqtrade 2026.10`.
 
 Every freqtrade command then runs as `docker compose run --rm freqtrade <command>`. In native installs, activate the venv first (`source ./.venv/bin/activate`) and run `freqtrade <command>` directly. Examples below use the short `freqtrade` form; prefix with `docker compose run --rm` in Docker.
 
