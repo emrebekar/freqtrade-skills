@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade strategy migration (v2 to v3)
 
-Updates old strategies and configs to the Freqtrade 2026.10 interface (strategy interface version 3). Users trade real money: a wrong rename can silently change trading behavior, so migrate in small steps and prove the result with a before and after backtest. The example pair ([tests/fixtures/strategies/LegacyV2.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/fixtures/strategies/LegacyV2.py) old, [tests/strategies/MigratedV3.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/MigratedV3.py) migrated) was run on the repo's test data (BTC/USDT and ETH/USDT, 5m, 2026-08-01 to 2026-10-01). Both are teaching examples, not profitable strategies; never present their numbers as a result.
+Updates old strategies and configs to the interface of the pinned Freqtrade release (strategy interface version 3). Pinned Freqtrade release: 2026.10. Users trade real money: a wrong rename can silently change trading behavior, so migrate in small steps and prove the result with a before and after backtest. The example pair ([tests/fixtures/strategies/LegacyV2.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/fixtures/strategies/LegacyV2.py) old, [tests/strategies/MigratedV3.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/MigratedV3.py) migrated) was run on the repo's test data (BTC/USDT and ETH/USDT, 5m, 2026-08-01 to 2026-10-01). Both are teaching examples, not profitable strategies; never present their numbers as a result.
 
 Rules:
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives. That is the only blanket exception: pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each, never silently ignore. A pass does not prove the strategy is clean (see freqtrade-validation).
@@ -14,11 +14,11 @@ Rules:
 - Migration is renaming plus new arguments, not a redesign. Do not change signal logic, ROI, stoploss or parameters while migrating; propose those separately.
 - Keep a copy of the original strategy and its backtest result before changing anything.
 - Read the whole old strategy and config first. Look names up in the references; do not invent renames. Label what you could not verify.
-- If the user wants shorts or futures, the migration is required: with a non-spot `trading_mode` the 2026.10 loader rejects old names (settings: run; methods: source-read). Futures and shorting also need `trading_mode`, `margin_mode` and `can_short = True`; leverage can liquidate the position, warn the user.
+- If the user wants shorts or futures, the migration is required: with a non-spot `trading_mode` the pinned release's loader rejects old names (settings: run; methods: source-read). Futures and shorting also need `trading_mode`, `margin_mode` and `can_short = True`; leverage can liquidate the position, warn the user.
 
-## What 2026.10 does with an old strategy (observed)
+## What the pinned release does with an old strategy (observed)
 
-On the 2026.10 image, in spot mode, the legacy fixture (`populate_buy_trend`, `populate_sell_trend`, `buy`/`sell` columns, `custom_sell`, `check_buy_timeout`, `sell_reason`, `use_sell_signal` and the other old settings, old `order_types` keys) still loads and backtests, with `DEPRECATED` warnings for the old settings and keys. The migrated version gave identical trades (200 trades, same pairs, dates, rates, profits, exit reasons). Exceptions found:
+On the pinned image, in spot mode, the legacy fixture (`populate_buy_trend`, `populate_sell_trend`, `buy`/`sell` columns, `custom_sell`, `check_buy_timeout`, `sell_reason`, `use_sell_signal` and the other old settings, old `order_types` keys) still loads and backtests, with `DEPRECATED` warnings for the old settings and keys. The migrated version gave identical trades (200 trades, same pairs, dates, rates, profits, exit reasons). Exceptions found:
 
 - A legacy `buy_tag` column crashes the backtest: `ValueError: cannot reindex on an axis with duplicate labels`. Rename it to `enter_tag`.
 - In non-spot trading modes the old setting names are errors, and per the shipped resolver source the old method names (`populate_buy_trend` without `populate_entry_trend`, `custom_sell`, `check_buy_timeout`, `check_sell_timeout`) raise `OperationalException`.
@@ -84,7 +84,7 @@ The core of the migration, tested ([tests/strategies/MigratedV3.py](https://gith
 freqtrade strategy-updater --strategy-list MyStrategy --strategy-path user_data/strategies
 ```
 
-It rewrites the file in place (the original goes to `<userdir>/strategies_orig_updater/`, overwritten on a second run). Observed on 2026.10: it renames the methods, columns, settings and the `buy`/`sell` keys of `order_types`, `order_time_in_force`, `unfilledtimeout`, sets `INTERFACE_VERSION = 3`, and the converted fixture traded identically. It does NOT rename the `emergencysell`/`forcesell`/`forcebuy` keys, does NOT add `side` or `is_short` arguments, does NOT rename `trade.sell_reason`, and does not touch the config. It can break code: a local variable `sell` is renamed at assignment but not inside a subscript (NameError), and a string such as the tag `"buy"` silently becomes `"entry"`. It also reformats the whole file. Details and evidence: references/strategy-updater.md.
+It rewrites the file in place (the original goes to `<userdir>/strategies_orig_updater/`, overwritten on a second run). Observed on the pinned release: it renames the methods, columns, settings and the `buy`/`sell` keys of `order_types`, `order_time_in_force`, `unfilledtimeout`, sets `INTERFACE_VERSION = 3`, and the converted fixture traded identically. It does NOT rename the `emergencysell`/`forcesell`/`forcebuy` keys, does NOT add `side` or `is_short` arguments, does NOT rename `trade.sell_reason`, and does not touch the config. It can break code: a local variable `sell` is renamed at assignment but not inside a subscript (NameError), and a string such as the tag `"buy"` silently becomes `"entry"`. It also reformats the whole file. Details and evidence: references/strategy-updater.md.
 
 ## Validation gate
 
@@ -115,7 +115,7 @@ Details of these commands: freqtrade-validation.
 ## References
 
 - references/v2-to-v3.md - full rename table with before/after code, config keys, FreqAI split, docs inconsistencies
-- references/deprecated.md - removed features and replacements (edge, hdf5, `ticker_interval`, protections in config, funding-rate timeframe 2025.12, funding-rate data format 2026.8 with the `funding_rate` column), what still works in 2026.10
+- references/deprecated.md - removed features and replacements (edge, hdf5, `ticker_interval`, protections in config, funding-rate timeframe 2025.12, funding-rate data format 2026.8 with the `funding_rate` column), what still works in the pinned release
 - references/strategy-updater.md - usage, what it converts, what it misses, hazards
 
 ## Related skills

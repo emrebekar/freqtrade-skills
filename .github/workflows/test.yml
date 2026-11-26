@@ -28,6 +28,8 @@ jobs:
         run: scripts/dpy.sh scripts/check_cli.py
       - name: validator self-tests
         run: bash tests/test_validate_skills.sh
+      - name: bump_version self-tests
+        run: bash tests/test_bump_version.sh
       - name: docs_diff self-tests
         run: bash tests/test_docs_diff.sh
       - name: check_cli self-tests

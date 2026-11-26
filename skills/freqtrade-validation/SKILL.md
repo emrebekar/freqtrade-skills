@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade validation (safety gate)
 
-Every other freqtrade skill routes here. A strategy is not "done", and its backtest or hyperopt numbers do not count, until `lookahead-analysis` and `recursive-analysis` pass. Freqtrade version assumed: 2026.10. Users trade real money: be strict, and never overstate what a pass proves.
+Every other freqtrade skill routes here. A strategy is not "done", and its backtest or hyperopt numbers do not count, until `lookahead-analysis` and `recursive-analysis` pass. Pinned Freqtrade release: 2026.10. Users trade real money: be strict, and never overstate what a pass proves.
 Sample outputs and trade counts in this skill and its references were observed on Binance sample data (2026-07..10), before the repo test data moved to OKX; rerun the commands on your data, expect different numbers.
 
 Rules:
@@ -33,7 +33,7 @@ freqtrade lookahead-analysis --strategy MyStrategy --timerange 20260801-20261001
 freqtrade lookahead-analysis --strategy MyStrategy --timerange 20260801-20261001 --minimum-trade-amount 10 --targeted-trade-amount 20 --lookahead-analysis-exportfilename lookahead.csv
 ```
 
-It runs a baseline backtest of all pairs, then re-runs a slice per entry and per exit signal on a one-pair pairlist and compares indicator values and moved entries/exits against the baseline. It does not read your code. It accepts the usual backtesting options but forces: `--cache none`, `--max-open-trades` at least the number of pairs, a 1 billion wallet, a static stake of 10000, protections off and market orders (so `custom_entry_price()` and `custom_exit_price()` are not called) unless `--allow-limit-orders` is given (the docs prose spells it `--lookahead-allow-limit-orders`; the 2026.10 help says `--allow-limit-orders`, which is what the CLI check accepts; limit orders can cause false positives).
+It runs a baseline backtest of all pairs, then re-runs a slice per entry and per exit signal on a one-pair pairlist and compares indicator values and moved entries/exits against the baseline. It does not read your code. It accepts the usual backtesting options but forces: `--cache none`, `--max-open-trades` at least the number of pairs, a 1 billion wallet, a static stake of 10000, protections off and market orders (so `custom_entry_price()` and `custom_exit_price()` are not called) unless `--allow-limit-orders` is given (the docs prose spells it `--lookahead-allow-limit-orders`; the pinned release's help says `--allow-limit-orders`, which is what the CLI check accepts; limit orders can cause false positives).
 
 Trade counts: `--targeted-trade-amount` is how many signals are verified (the docs' column `total_signals` defaults to 20), `--minimum-trade-amount` is the least acceptable (the help text gives no default; in a test the message read "too few trades caught (0/10)", so it appears to be 10). With fewer trades than the minimum the analysis is cancelled for that strategy: use a wider or busier timerange, or lower the minimum knowingly.
 

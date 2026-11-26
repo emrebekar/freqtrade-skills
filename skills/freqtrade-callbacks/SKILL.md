@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade strategy callbacks
 
-Callbacks are strategy methods the bot calls "whenever needed" (during a trade, or when entering or exiting), unlike `populate_*` which are vectorized. Freqtrade version assumed: 2026.10. The example classes `CallbacksExample` and `PositionAdjustExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) were run through backtesting, `lookahead-analysis` and `recursive-analysis` on test data, and the backtest exports were inspected to confirm each callback fired (see "What the tests showed"). They are teaching examples, not profitable strategies; never present them as such.
+Callbacks are strategy methods the bot calls "whenever needed" (during a trade, or when entering or exiting), unlike `populate_*` which are vectorized. Pinned Freqtrade release: 2026.10. The example classes `CallbacksExample` and `PositionAdjustExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) were run through backtesting, `lookahead-analysis` and `recursive-analysis` on test data, and the backtest exports were inspected to confirm each callback fired (see "What the tests showed"). They are teaching examples, not profitable strategies; never present them as such.
 Sample outputs and trade counts in this skill and its references were observed on Binance sample data (2026-07..10), before the repo test data moved to OKX; rerun the commands on your data, expect different numbers.
 
 Rules:

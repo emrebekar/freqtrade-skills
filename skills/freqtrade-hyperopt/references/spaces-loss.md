@@ -66,7 +66,7 @@ A loss function returns a number; smaller is better. Docs descriptions of the bu
 | `ProfitDrawDownHyperOptLoss` | max profit and min drawdown; `DRAWDOWN_MULT` in the loss file adjusts strictness |
 | `MultiMetricHyperOptLoss` | profit and drawdown, plus profit factor, expectancy ratio, win rate; penalizes epochs with few trades |
 
-Observed (`list-hyperoptloss` in the 2026.10 image, test userdir) 14 names: the 12 above plus `DefaultHyperOptLoss` (loaded from `hyperopt_loss_short_trade_dur.py`, not in the docs' list) and `SampleHyperOptLoss` (the template file `sample_hyperopt_loss.py` created by `create-userdir` in the user dir). Check your own install:
+Observed (`list-hyperoptloss` in the pinned image, test userdir) 14 names: the 12 above plus `DefaultHyperOptLoss` (loaded from `hyperopt_loss_short_trade_dur.py`, not in the docs' list) and `SampleHyperOptLoss` (the template file `sample_hyperopt_loss.py` created by `create-userdir` in the user dir). Check your own install:
 
 ```bash
 freqtrade list-hyperoptloss
@@ -77,7 +77,7 @@ Docs: failed loads print red (LOAD FAILED) and duplicate names yellow (DUPLICATE
 
 The tested run used `SharpeHyperOptLossDaily`. With 5 epochs and a loss-making strategy the "best" epoch (lowest objective) was the one with only 33 trades and total profit -0.16%, against 151 to 217 trades and -0.8% to -2.8% for the others (observed, test data): a loss function can rank a barely-trading epoch first.
 
-## Command options (2026.10 help)
+## Command options (pinned release's help)
 
 ```bash
 freqtrade hyperopt --strategy MyStrategy --hyperopt-loss SharpeHyperOptLossDaily --spaces buy sell -e 100 --timerange 20260101-20260601 --random-state 42 --min-trades 30 --early-stop 25 -j -2
@@ -87,7 +87,7 @@ freqtrade hyperopt --strategy MyStrategy --hyperopt-loss SharpeHyperOptLossDaily
 - `--early-stop INT`: stop after that many epochs without improvement (default 0 = off). Docs: a good value is 20-30% of the epochs; a value above 0 and below 20 is replaced by 20.
 - `--timerange`: limit the data used (see results-overfitting.md for the train/test split).
 - `--min-trades INT`: minimal desired number of trades for evaluations (default 1). Observed: with `--min-trades 100` on two weeks of test data all 3 epochs were rejected, hyperopt printed "No good result found for given optimization function in 3 epochs." and the exit code was still 0.
-- `-j, --job-workers`: -1 (default) all CPUs, -2 all but one, 1 means no parallel code. Docs carry a note "Hyperopt can crash when used with only 1 CPU Core" (issue #1133, an old report) while the help describes `-j 1` as supported; `-j 1` worked in the repo test (5 epochs, 2026.10). Docs: `print()` output shows only with `-j 1`.
+- `-j, --job-workers`: -1 (default) all CPUs, -2 all but one, 1 means no parallel code. Docs carry a note "Hyperopt can crash when used with only 1 CPU Core" (issue #1133, an old report) while the help describes `-j 1` as supported; `-j 1` worked in the repo test (5 epochs, pinned release). Docs: `print()` output shows only with `-j 1`.
 - `--random-state INT`: reproducibility. The first 30 epochs (docs: "currently 30") are random and marked `*`; with unchanged options, data, strategy and loss the same random state gives the same results. Observed: two identical runs with `--random-state 42` produced the same 5 epochs, objectives and parameters. With fewer than 30 epochs the whole run is random exploration, not optimization.
 - `--analyze-per-epoch`, `--disable-param-export`, `--ignore-missing-spaces`: see parameters.md and results-overfitting.md.
 - `--print-all`, `--print-json`, `--no-color`: output formatting.

@@ -14,7 +14,7 @@ RECURSIVE_MAX_VARIANCE_PCT = 0.5
 STRATEGY_COL = "(from strategy)"
 NO_VARIANCE_MSG = "No variance on indicator(s) found due to recursive formula."
 # --freqai: besides the docs-named set_freqai_targets() columns (&-prefixed), lookahead-analysis flags FreqAI outputs and the
-# signal columns built from them. Observed on 2026.10: do_predict, enter_long, exit_long, enter_tag, exit_tag.
+# signal columns built from them. Observed on the pinned release: do_predict, enter_long, exit_long, enter_tag, exit_tag.
 # enter_short, exit_short, DI_values are symmetric but unobserved. Ignored ONLY when at least one & column is also
 # flagged (they differ because the model is retrained per slice); biased_entry/exit_signals counts still fail.
 FREQAI_DERIVED = {"do_predict", "DI_values", "enter_long", "enter_short", "exit_long", "exit_short", "enter_tag", "exit_tag"}

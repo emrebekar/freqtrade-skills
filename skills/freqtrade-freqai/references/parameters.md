@@ -4,7 +4,7 @@ Source: docs/freqai-configuration.md#important-dataframe-key-patterns
 
 # FreqAI parameter reference
 
-Defaults are the docs' parameter table values; "schema" marks a value read from the 2026.10 image's config schema (observed), "none" means no default is documented.
+Defaults are the docs' parameter table values; "schema" marks a value read from the pinned image's config schema (observed), "none" means no default is documented.
 
 ## `freqai` (general)
 

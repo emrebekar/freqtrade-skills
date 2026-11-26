@@ -27,9 +27,9 @@ XGBoostRegressor
 XGBoostRegressorMultiTarget
 ```
 
-Without `-1` the command prints a table with `Strategy name`, `Location` and `Status`. In this image five more built-in files show `LOAD FAILED` because torch / stable-baselines are not installed (observed): `PyTorchTransformerRegressor`, `PyTorchMLPRegressor`, `PyTorchMLPClassifier`, `ReinforcementLearner`, `ReinforcementLearner_multiproc`. They need the torch or RL image (docs: `stable_freqaitorch`, `stable_freqairl` tags, or the matching install answer in `setup.sh`).
+Without `-1` the command prints a table with `Strategy name`, `Location` and `Status`. In this image five more built-in files show `LOAD FAILED` because torch / stable-baselines are not installed (observed): `PyTorchTransformerRegressor`, `PyTorchMLPRegressor`, `PyTorchMLPClassifier`, `ReinforcementLearner`, `ReinforcementLearner_multiproc`. They need the torch or RL image (pinned tags `2026.10_freqaitorch`, `2026.10_freqairl`; docs name them `stable_freqaitorch`, `stable_freqairl`; or the matching install answer in `setup.sh`).
 
-Docs inconsistencies: the introduction says "Eight examples are currently available"; the image lists ten usable plus five that need extra packages. Docs list CatBoost among the libraries but note it is "no longer actively supported since 2025.12"; no CatBoost model appears in the 2026.10 list. Verify with `list-freqaimodels` rather than the docs.
+Docs inconsistencies: the introduction says "Eight examples are currently available"; the image lists ten usable plus five that need extra packages. Docs list CatBoost among the libraries but note it is "no longer actively supported since 2025.12"; no CatBoost model appears in the pinned release's list. Verify with `list-freqaimodels` rather than the docs.
 
 ## Regressor or classifier
 

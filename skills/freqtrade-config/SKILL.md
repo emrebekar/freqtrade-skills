@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade configuration
 
-How to configure the bot (`config.json`) correctly and safely. Freqtrade version assumed: 2026.10. All keys here come from the Freqtrade configuration docs; look keys up in references/config-keys.md rather than guessing names.
+How to configure the bot (`config.json`) correctly and safely. Pinned Freqtrade release: 2026.10. All keys here come from the Freqtrade configuration docs; look keys up in references/config-keys.md rather than guessing names.
 
 Rules:
 - Keep `dry_run: true` until the strategy passed backtesting and dry-run observation. Never set `dry_run: false` unless the user explicitly asks.
@@ -85,7 +85,7 @@ export FREQTRADE__TELEGRAM__CHAT_ID=<telegramChatId>
 export FREQTRADE__EXCHANGE__PAIR_WHITELIST='["BTC/USDT", "ETH/USDT"]'
 ```
 
-   Env vars override config values; JSON lists are parsed as JSON. The docs' own example uses `FREQTRADE__EXCHANGE__KEY`; the code accepts both `api_key` and the older `key`, but `api_key` wins when both are present, so use `FREQTRADE__EXCHANGE__API_KEY` (verified with `show-config` on 2026.10). The config file path cannot come from an env var. Loaded env vars are logged at startup.
+   Env vars override config values; JSON lists are parsed as JSON. The docs' own example uses `FREQTRADE__EXCHANGE__KEY`; the code accepts both `api_key` and the older `key`, but `api_key` wins when both are present, so use `FREQTRADE__EXCHANGE__API_KEY` (verified with `show-config` on the pinned release). The config file path cannot come from an env var. Loaded env vars are logged at startup.
 
 Check the merged result; secrets are redacted unless `--show-sensitive` is given (do not paste that output anywhere):
 
@@ -120,7 +120,7 @@ Binance (BNB blacklist, binance vs binanceus, futures modes), Bybit, OKX (`passw
 ## Workflow
 
 1. Read the existing config before editing; change only what was asked.
-2. Look up every key name in references/config-keys.md; do not invent keys. `show-config` rejects wrong value types but accepts unknown keys (verified on 2026.10), so a misspelled key is silently ignored.
+2. Look up every key name in references/config-keys.md; do not invent keys. `show-config` rejects wrong value types but accepts unknown keys (verified on the pinned release), so a misspelled key is silently ignored.
 3. Run `freqtrade show-config --config <file>` to validate the file (value-type errors are reported) and see the merged result.
 4. For a pairlist change run `freqtrade test-pairlist`; for pricing/protection changes backtest with `--enable-protections` where relevant.
 5. Switching to live is a separate, explicit decision by the user: `dry_run: false`, a fresh `db_url`, keys via private config or env vars, small stake.

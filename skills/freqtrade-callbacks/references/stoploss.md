@@ -77,11 +77,11 @@ Docs conflict: the position-adjust warning in strategy-callbacks.md says "Stoplo
 
 ## Helpers
 
-Import them from `freqtrade.strategy`. The docs show usage only; the signatures below were read with `inspect.signature` in the 2026.10 image.
+Import them from `freqtrade.strategy`. The docs show usage only; the signatures below were read with `inspect.signature` in the pinned image.
 
 `stoploss_from_open(open_relative_stop, current_profit, is_short=False, leverage=1.0)`: converts "X profit above the open price" into the current-price-relative value the callback must return. Docs example: open 100, price 121 (`current_profit` 0.21): `stoploss_from_open(0.07, 0.21, False)` returns 0.1157024793; 11.57% below 121 is 107, 7% above 100. Leverage is considered.
 
-Checked in the 2026.10 image: `stoploss_from_open(0.07, 0.21, False)` returned `0.11570247933884292`, and `stoploss_from_open(0.07, 0.05, False)` returned `0.0` (profit below the wanted stop). The docs warn that invalid input (profit below the requested level, for example when `confirm_trade_exit()` blocked a close) can produce "CustomStoploss function did not return valid stoploss" warnings, and suggest the `stoploss_from_open(...) or 1` idiom. Docs contradiction: the callback section says `None` is the only safe way to leave the stoploss unchanged, yet the idiom and one docs example return `1`. The tested example avoids both by gating on `current_profit > 0.01`, above the 0.005 target, and otherwise returning the trail. Prefer `None` for "no change".
+Checked in the pinned image: `stoploss_from_open(0.07, 0.21, False)` returned `0.11570247933884292`, and `stoploss_from_open(0.07, 0.05, False)` returned `0.0` (profit below the wanted stop). The docs warn that invalid input (profit below the requested level, for example when `confirm_trade_exit()` blocked a close) can produce "CustomStoploss function did not return valid stoploss" warnings, and suggest the `stoploss_from_open(...) or 1` idiom. Docs contradiction: the callback section says `None` is the only safe way to leave the stoploss unchanged, yet the idiom and one docs example return `1`. The tested example avoids both by gating on `current_profit > 0.01`, above the 0.005 target, and otherwise returning the trail. Prefer `None` for "no change".
 
 `stoploss_from_absolute(stop_rate, current_rate, is_short=False, leverage=1.0)`: converts an absolute stop price to the relative value. Checked in the image: `stoploss_from_absolute(196, 200, is_short=False)` returned `0.02` (about; `0.020000000000000018`).
 

@@ -101,7 +101,7 @@ Class attributes (lines 8-18): `INTERFACE_VERSION = 3`, `timeframe = "5m"`, `can
 ## Prefixes
 
 - `%name`: a training feature. Removed from the dataframe FreqAI returns (tens of thousands can be created).
-- `%%name`: also a training feature, but returned to the strategy for FreqUI and `plot-dataframe` (docs). Observed on 2026.10: `lookahead-analysis` and `recursive-analysis` then list these columns as biased even for a clean RSI, so a `%%` column cannot serve as proof either way. Use `%%` only for plotting.
+- `%%name`: also a training feature, but returned to the strategy for FreqUI and `plot-dataframe` (docs). Observed on the pinned release: `lookahead-analysis` and `recursive-analysis` then list these columns as biased even for a clean RSI, so a `%%` column cannot serve as proof either way. Use `%%` only for plotting.
 - `&name`: a target. FreqAI returns the prediction under the same name (`&-s_close`) plus `&-s_close_mean` and `&-s_close_std`, the training statistics (or live statistics with `fit_live_predictions_candles`). Docs naming convention `&-s*`.
 - Hyphen naming is convention. The classifier docs use `&s-up_or_down`; both start with `&`.
 

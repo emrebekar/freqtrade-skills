@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade strategy development
 
-How to write a correct Freqtrade strategy. Freqtrade version assumed: 2026.10, strategy interface version 3. Every example class here was run through backtesting, `lookahead-analysis` and `recursive-analysis` on test data ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)). They are teaching examples, not profitable strategies; never present them as such.
+How to write a correct Freqtrade strategy. Pinned Freqtrade release: 2026.10. Strategy interface version 3. Every example class here was run through backtesting, `lookahead-analysis` and `recursive-analysis` on test data ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)). They are teaching examples, not profitable strategies; never present them as such.
 Sample outputs and trade counts in this skill and its references were observed on Binance sample data (2026-07..10), before the repo test data moved to OKX; rerun the commands on your data, expect different numbers.
 
 Rules:

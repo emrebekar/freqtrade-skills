@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade backtesting
 
-Run a strategy over historical candles, read the result honestly, dig into which entries and exits made or lost money. Freqtrade version assumed: 2026.10. Outputs shown below were produced by running the repo's teaching strategy `IndicatorsExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) on the repo's test data (BTC/USDT and ETH/USDT, 5m, 2026-08-01 to 2026-09-30). That strategy is not profitable in any meaningful sense; never present its numbers as a result.
+Run a strategy over historical candles, read the result honestly, dig into which entries and exits made or lost money. Pinned Freqtrade release: 2026.10. Outputs shown below were produced by running the repo's teaching strategy `IndicatorsExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) on the repo's test data (BTC/USDT and ETH/USDT, 5m, 2026-08-01 to 2026-09-30). That strategy is not profitable in any meaningful sense; never present its numbers as a result.
 Sample outputs and trade counts in this skill and its references were observed on Binance sample data (2026-07..10), before the repo test data moved to OKX; rerun the commands on your data, expect different numbers.
 
 Rules:
@@ -32,7 +32,7 @@ Rules:
 freqtrade backtesting --strategy MyStrategy --timerange 20260801-20261001 --cache none
 ```
 
-Common options (all verified against `freqtrade backtesting --help` on 2026.10 by the repo's CLI checker):
+Common options (all verified against `freqtrade backtesting --help` on the pinned release by the repo's CLI checker):
 
 | Goal | Option |
 |------|--------|
@@ -125,7 +125,7 @@ freqtrade backtesting-show --breakdown weekday
 
 ### Plotting
 
-`plot-dataframe` and `plot-profit` need Plotly, which the standard images do not contain. Verified on 2026.10: `freqtradeorg/freqtrade:2026.10` and `2026.10_freqai` fail with `ModuleNotFoundError: No module named 'plotly'`; `freqtradeorg/freqtrade:2026.10_plot` exists and generated both HTML plots into `<userdir>/plot/`. Native installs: `pip install -U -r requirements-plot.txt`. The docs mark both commands deprecated (maintenance mode) and recommend FreqUI. Details and `plot_config`: references/plotting.md.
+`plot-dataframe` and `plot-profit` need Plotly, which the standard images do not contain. Verified on the pinned release: `freqtradeorg/freqtrade:2026.10` and `2026.10_freqai` fail with `ModuleNotFoundError: No module named 'plotly'`; `freqtradeorg/freqtrade:2026.10_plot` exists and generated both HTML plots into `<userdir>/plot/`. Native installs: `pip install -U -r requirements-plot.txt`. The docs mark both commands deprecated (maintenance mode) and recommend FreqUI. Details and `plot_config`: references/plotting.md.
 
 ```bash
 freqtrade plot-dataframe --strategy IndicatorsExample -p BTC/USDT --timerange 20260801-20260805 --indicators1 ema_fast ema_slow --indicators2 rsi

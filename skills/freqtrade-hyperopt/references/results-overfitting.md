@@ -52,7 +52,7 @@ You can also paste the printed blocks (`buy_params = {...}`, `sell_params`, `min
 
 > config > parameter file > strategy `*_params` > parameter default
 
-Observed in a backtest on the 2026.10 image (temp copy, not committed): strategy `buy_params = {"buy_rsi": 30}` with a JSON file holding `buy_rsi: 20` loaded `buy_rsi = 20` (file beats strategy `*_params`); a JSON `stoploss: -0.2` was used ("Strategy using stoploss: -0.2") until the config set `"stoploss": -0.05`, which then won ("Override strategy 'stoploss' with value from the configuration: -0.05"). A parameter with no value anywhere logged `Strategy Parameter(default)`.
+Observed in a backtest on the pinned image (temp copy, not committed): strategy `buy_params = {"buy_rsi": 30}` with a JSON file holding `buy_rsi: 20` loaded `buy_rsi = 20` (file beats strategy `*_params`); a JSON `stoploss: -0.2` was used ("Strategy using stoploss: -0.2") until the config set `"stoploss": -0.05`, which then won ("Override strategy 'stoploss' with value from the configuration: -0.05"). A parameter with no value anywhere logged `Strategy Parameter(default)`.
 
 Consequences:
 - A forgotten JSON file silently overrides the values in your strategy. Docs: "Verify that you do not have an unexpected parameters JSON file overriding the parameters". Check the backtest log lines `Strategy Parameter: ...` for what was actually used.

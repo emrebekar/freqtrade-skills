@@ -9,7 +9,7 @@ The docs mark `plot-dataframe` and `plot-profit` as deprecated (maintenance mode
 
 ## Dependencies (verified)
 
-Plotly is required (`requirements-plot.txt`, plotly pinned there). Test on 2026.10:
+Plotly is required (`requirements-plot.txt`, plotly pinned there). Test on the pinned release:
 
 | Image | Result |
 |-------|--------|
@@ -28,7 +28,7 @@ freqtrade plot-dataframe --strategy AwesomeStrategy -p BTC/ETH --timerange=20180
 freqtrade plot-dataframe --strategy AwesomeStrategy --db-url sqlite:///tradesv3.dry_run.sqlite -p BTC/ETH --trade-source DB
 ```
 
-One HTML file per pair. Needs backtest data, a strategy and a backtest result (or a trades database). Real run on 2026.10 used the latest result automatically: `freqtrade plot-dataframe --strategy IndicatorsExample -p BTC/USDT --timerange 20260801-20260805 --indicators1 ema_fast ema_slow --indicators2 rsi`.
+One HTML file per pair. Needs backtest data, a strategy and a backtest result (or a trades database). Real run on the pinned release used the latest result automatically: `freqtrade plot-dataframe --strategy IndicatorsExample -p BTC/USDT --timerange 20260801-20260805 --indicators1 ema_fast ema_slow --indicators2 rsi`.
 
 Elements: green triangles entry signals (not every signal becomes a trade), red triangles exit signals, cyan circles trade entries, red squares losing or 0% exits, green squares profitable exits, `--indicators1` on the price plot (default `sma ema3 ema5`), volume bars, `--indicators2` in the lower plot (default `macd macdsignal`). Bollinger bands are drawn automatically when `bb_lowerband` and `bb_upperband` columns exist. With position adjustment the averaged entry price can lie outside the candle range.
 

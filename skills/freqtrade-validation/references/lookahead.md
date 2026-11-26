@@ -18,7 +18,7 @@ Lookahead bias: indicators or signals use data from candles that would not exist
 
 Forced settings (docs): `--cache none`; `--max-open-trades` at least the number of pairs; dry-run wallet 1 billion; stake amount 10000; protections off; `order_types` forced to market unless `--allow-limit-orders`. The log line `Forced max_open_trades to -1 (same amount as there are pairs)` confirms the first one (observed).
 
-## Options added on top of backtesting (2026.10 help)
+## Options added on top of backtesting (pinned release's help)
 
 | Option | Meaning |
 |--------|---------|
@@ -61,4 +61,4 @@ Fixtures in [tests/fixtures/strategies/](https://github.com/emrebekar/freqtrade-
 
 ## Docs inconsistency
 
-`docs/lookahead-analysis.md` prose names the flag `--lookahead-allow-limit-orders`; the 2026.10 CLI help has `--allow-limit-orders`. The repo CLI checker accepts only the help spelling.
+`docs/lookahead-analysis.md` prose names the flag `--lookahead-allow-limit-orders`; the pinned release's CLI help has `--allow-limit-orders`. The repo CLI checker accepts only the help spelling.

@@ -5,7 +5,7 @@ Source: docs/strategy-customization.md#common-mistakes-when-developing-strategie
 
 # What backtesting assumes
 
-Backtesting cannot see how prices moved inside a candle (was high before low?). These are the docs' assumptions (2026.10); every result is only as good as they are.
+Backtesting cannot see how prices moved inside a candle (was high before low?). These are the docs' assumptions (pinned release); every result is only as good as they are.
 
 ## Fills and prices
 
@@ -33,7 +33,7 @@ freqtrade backtesting --strategy AwesomeStrategy --timeframe 1h --timeframe-deta
 
 The strategy runs on the main timeframe. Candles where activity can happen (an active signal, the pair is in a trade) are evaluated on the detail timeframe. Entries still happen at the main candle's open, but trade slots can free earlier, and with several pairs competing for slots results can differ a lot (docs example). All callbacks (`custom_exit()`, `custom_stoploss()` and so on) run on every detail candle once the trade is open (12 times for 1h with 5m detail). The detail timeframe must be smaller than the main one, data for it must be downloaded, and memory and runtime grow. The docs suggest using it as the last part of development to check the strategy is not exploiting the assumptions above. Strategies that perform similarly with it have a good chance of doing so in dry/live (only dry-run confirms).
 
-Verified on 2026.10 (test data, IndicatorsExample, `-i 1h --timeframe-detail 5m`): the run succeeded; no profit conclusions are drawn from it here.
+Verified on the pinned release (test data, IndicatorsExample, `-i 1h --timeframe-detail 5m`): the run succeeded; no profit conclusions are drawn from it here.
 
 ## Other limits
 

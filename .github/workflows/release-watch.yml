@@ -112,7 +112,7 @@ jobs:
             echo
             echo "Workflow run: $RUN_URL"
             echo
-            echo "To refresh: update the affected reference files, then run 'git grep -n 2026.10' and bump every hit (workflows, scripts/dpy.sh, tests/*, README, freqtrade-version.json, SKILL footers), then open a reviewed PR."
+            echo "To refresh: update the affected reference files, run 'python3 scripts/bump_version.py <new tag>' (resolves the docs commit with git ls-remote and rewrites image tags, pinned lines, footers and pin files), re-observe outputs that changed, then open a reviewed PR. scripts/validate_skills.py fails on a stale image tag or a hand-written version in skill prose."
           } > body-foot.md
           # Only the docs diff is truncated, so the summary and footer always survive.
           budget=$(( limit - $(wc -c < body-head.md) - $(wc -c < body-foot.md) - 200 ))

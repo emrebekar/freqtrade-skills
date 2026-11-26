@@ -4,7 +4,7 @@ Source: docs/strategy-customization.md (INTERFACE_VERSION paragraph)
 
 # V2 to V3 rename table
 
-Labels: `docs` = from the Freqtrade docs 2026.10 (strategy_migration.md); `observed` = seen in this repo's runs on the 2026.10 image ([tests/test_migration_fixtures.sh](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/test_migration_fixtures.sh), tests/out/migration/); `tested` = code byte-identical to [tests/strategies/MigratedV3.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/MigratedV3.py), which passes backtesting, `lookahead-analysis` and `recursive-analysis`. Caveat: `custom_stoploss` in MigratedV3 is not enabled (`use_custom_stoploss` unset): import/syntax and updater-conversion only, never executed; `confirm_trade_entry` / `custom_entry_price` run as pass-throughs. MigratedV3 is the hand migration of [tests/fixtures/strategies/LegacyV2.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/fixtures/strategies/LegacyV2.py). Both are teaching examples, not profitable strategies.
+Labels: `docs` = from the Freqtrade docs of the pinned release (strategy_migration.md); `observed` = seen in this repo's runs on the pinned image ([tests/test_migration_fixtures.sh](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/test_migration_fixtures.sh), tests/out/migration/); `tested` = code byte-identical to [tests/strategies/MigratedV3.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/MigratedV3.py), which passes backtesting, `lookahead-analysis` and `recursive-analysis`. Caveat: `custom_stoploss` in MigratedV3 is not enabled (`use_custom_stoploss` unset): import/syntax and updater-conversion only, never executed; `confirm_trade_entry` / `custom_entry_price` run as pass-throughs. MigratedV3 is the hand migration of [tests/fixtures/strategies/LegacyV2.py](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/fixtures/strategies/LegacyV2.py). Both are teaching examples, not profitable strategies.
 
 Interface version: docs say `INTERFACE_VERSION` should be 3 and that 3 is also the default when it is not set. Set it explicitly to 3 after migrating. A strategy that still says 2 "will need to be updated to v3 terminology as future versions will require this to be set" (docs, strategy-customization.md).
 
@@ -60,7 +60,7 @@ Exit columns, tested (the old form was `["sell", "exit_tag"]`; the docs example 
         return dataframe
 ```
 
-Observed (2026.10 image, spot, `buy_tag` NOT used): a strategy with `populate_buy_trend` / `populate_sell_trend` and `buy` / `sell` columns still loads and backtests; Freqtrade renames `buy` to `enter_long` and `sell` to `exit_long` after the call. Observed crash: if the old `populate_buy_trend` writes a `buy_tag` column, the backtest dies with `ValueError: cannot reindex on an axis with duplicate labels`, because Freqtrade pre-creates `enter_tag` and then renames `buy_tag` to a second `enter_tag`. Rename `buy_tag` to `enter_tag` in the strategy yourself.
+Observed (pinned image, spot, `buy_tag` NOT used): a strategy with `populate_buy_trend` / `populate_sell_trend` and `buy` / `sell` columns still loads and backtests; Freqtrade renames `buy` to `enter_long` and `sell` to `exit_long` after the call. Observed crash: if the old `populate_buy_trend` writes a `buy_tag` column, the backtest dies with `ValueError: cannot reindex on an axis with duplicate labels`, because Freqtrade pre-creates `enter_tag` and then renames `buy_tag` to a second `enter_tag`. Rename `buy_tag` to `enter_tag` in the strategy yourself.
 
 ## Strategy-level settings (docs)
 
@@ -113,7 +113,7 @@ Docs inconsistency: the docs "Strategy level settings" example writes `sell_prof
     unfilledtimeout = {"entry": 10, "exit": 10, "unit": "minutes"}
 ```
 
-Observed: with the old keys the 2026.10 spot backtest only logs `DEPRECATED` warnings for each key (`order_types.buy`, `.sell`, `.emergencysell`, `.forcesell`, `.forcebuy`, `order_time_in_force.buy/.sell`, `unfilledtimeout.buy/.sell`). The docs note the old keys "will be removed in the next versions", so migrate them.
+Observed: with the old keys the pinned release's spot backtest only logs `DEPRECATED` warnings for each key (`order_types.buy`, `.sell`, `.emergencysell`, `.forcesell`, `.forcebuy`, `order_time_in_force.buy/.sell`, `unfilledtimeout.buy/.sell`). The docs note the old keys "will be removed in the next versions", so migrate them.
 
 ## Callbacks, tested (MigratedV3.py lines 82-104)
 
@@ -176,7 +176,7 @@ Imports for these signatures (MigratedV3.py line 9): `from freqtrade.persistence
 
 ## Terminology, pricing and notification settings (docs)
 
-Exit reason strings changed. Update any `exit_reason` / `trade.exit_reason` comparison and any report filter that used the old strings: `sell_signal` to `exit_signal`, `custom_sell` to `custom_exit`, `force_sell` to `force_exit`, `emergency_sell` to `emergency_exit`. Source-read (2026.10 persistence migration code, not run here): old `custom_sell` rows in the database are rewritten to `custom_exit`.
+Exit reason strings changed. Update any `exit_reason` / `trade.exit_reason` comparison and any report filter that used the old strings: `sell_signal` to `exit_signal`, `custom_sell` to `custom_exit`, `force_sell` to `force_exit`, `emergency_sell` to `emergency_exit`. Source-read (pinned release's persistence migration code, not run here): old `custom_sell` rows in the database are rewritten to `custom_exit`.
 
 Config (docs):
 

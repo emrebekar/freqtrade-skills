@@ -40,7 +40,7 @@ Move the start of the range back by `train_period_days` and by the `startup_cand
 
 ## Model and prediction reuse
 
-- Same `identifier`, same config: FreqAI finds saved predictions and trains nothing. Observed on 2026.10: second backtest logged `Found backtesting prediction file ...` for every window, `0` trainings, and identical results (570 trades, same totals).
+- Same `identifier`, same config: FreqAI finds saved predictions and trains nothing. Observed on the pinned release: second backtest logged `Found backtesting prediction file ...` for every window, `0` trainings, and identical results (570 trades, same totals).
 - Docs: this exists so you can tune entry/exit criteria quickly. To change features, set a new `identifier`. Observed: running a strategy with an extra feature under the old `identifier` logged `ERROR ... Trying to access pretrained model with identifier but found different features furnished by current strategy. Change identifier to train from scratch` (the harness regex treats `ERROR` as failure, so this cannot pass silently).
 - Not tested: changing a feature's formula but keeping its name. Treat any change in feature or label code, `label_period_candles`, timeframes, pairs, outlier options or model as requiring a new `identifier` (docs).
 - Predictions are stored in `backtesting_predictions/` (feather) and, for dry/live, `historic_predictions.pkl` (docs).
@@ -58,7 +58,7 @@ freqtrade trade --strategy MyFreqaiStrategy --config config.json --freqaimodel L
 
 (Docs; not run here. Docs quick start uses `FreqaiExampleStrategy` from `freqtrade/templates` with `--strategy-path freqtrade/templates`, and warns that example is for showcasing, not production.) FreqAI downloads the needed data itself, trains a model per pair (a queue keeps models equally fresh), and predicts with the newest model.
 - `live_retrain_hours` (default 0: as often as possible) waits at least that long between trainings.
-- `expiration_hours` (default 0: never) stops predictions from older models; `do_predict` is then 2. Docs inconsistency: the live deployment text and the `do_predict` table call it `expired_hours`. Observed in the 2026.10 image: the code reads only `expiration_hours`; `expired_hours` appears nowhere in the code base. Use `expiration_hours`.
+- `expiration_hours` (default 0: never) stops predictions from older models; `do_predict` is then 2. Docs inconsistency: the live deployment text and the `do_predict` table call it `expired_hours`. Observed in the pinned image: the code reads only `expiration_hours`; `expired_hours` appears nowhere in the code base. Use `expiration_hours`.
 - Model age matters: with 50 pairs at 5 minutes each the oldest model is over 4 hours old (docs example).
 - Starting from a saved `identifier` still retrains if `live_retrain_hours` elapsed since the model's end.
 - `wait_for_training_iteration_on_reload` (default true) waits for a training to finish on `/reload` or ctrl-c.
@@ -79,7 +79,7 @@ freqtrade hyperopt --hyperopt-loss SharpeHyperOptLoss --strategy MyFreqaiStrateg
 
 ## lookahead-analysis and recursive-analysis on FreqAI strategies
 
-Docs: `lookahead-analysis` "also supports freqai strategies"; its `biased_indicators` column "will falsely flag FreqAI target indicators defined in `set_freqai_targets()` as biased. These are not biased and can safely be ignored." The docs say nothing about FreqAI under `recursive-analysis`. Observed on 2026.10 with `FreqaiExample` (both commands accept `--freqaimodel`):
+Docs: `lookahead-analysis` "also supports freqai strategies"; its `biased_indicators` column "will falsely flag FreqAI target indicators defined in `set_freqai_targets()` as biased. These are not biased and can safely be ignored." The docs say nothing about FreqAI under `recursive-analysis`. Observed on the pinned release with `FreqaiExample` (both commands accept `--freqaimodel`):
 
 | Check | Observed |
 |-------|----------|
