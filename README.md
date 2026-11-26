@@ -54,7 +54,7 @@ Every development skill carries a validation gate. An agent using these skills w
 ## Tested against
 
 - Freqtrade `2026.10`
-- Freqtrade docs commit `4cf0351e08d26e96a6429ef48103b726bb230cf8` (recorded in `freqtrade-version.json`)
+- Freqtrade docs commit: `docs_commit` in `freqtrade-version.json`
 - Docker images `freqtradeorg/freqtrade:2026.10` and `freqtradeorg/freqtrade:2026.10_freqai`
 
 ## Running the tests
@@ -65,7 +65,7 @@ Needs Docker only; no host Python. Scripts run inside the pinned image.
 bash tests/run_all.sh                 # every strategy in tests/strategies.json: backtest + lookahead + recursive
 bash tests/run_checks.sh SampleSmoke  # one strategy
 bash tests/run_hyperopt.sh HyperoptExample
-bash tests/test_validate_skills.sh && bash tests/test_check_cli.sh && bash tests/test_docs_diff.sh
+bash tests/test_validate_skills.sh && bash tests/test_bump_version.sh && bash tests/test_check_cli.sh && bash tests/test_docs_diff.sh
 scripts/dpy.sh scripts/validate_skills.py && scripts/dpy.sh scripts/check_cli.py
 ```
 
@@ -73,7 +73,7 @@ Slow manual suites (also available as the `slow` job via `workflow_dispatch` in 
 
 ## Refreshing for a new Freqtrade release
 
-`.github/workflows/release-watch.yml` runs weekly (and on demand). When Freqtrade publishes a newer stable release than `freqtrade-version.json`, it tests the skills against the new image (`FT_IMAGE` for `scripts/dpy.sh`, `FT_TAG` for `tests/run_all.sh`), runs `scripts/docs_diff.py` and opens an issue titled `Freqtrade <tag> released: refresh skills`. The issue lists changed doc sections mapped to the reference files whose `Source:` lines cite them, plus dangling anchors. The rewrite itself is always a reviewed PR; nothing is committed automatically. Locally: `scripts/dpy.sh` cannot clone (the image has no git), so run `python3 scripts/docs_diff.py --old 2026.9 --new 2026.10` on a host with Python and git, or pass `--old-dir/--new-dir`. Self-test: `bash tests/test_docs_diff.sh`. `scripts/validate_skills.py` fails on any `freqtradeorg/freqtrade` image in a skill whose tag is not the `freqtrade-version.json` release (or a `_flavour` of it), so a missed bump, `latest`, `develop`, `stable` or an untagged image cannot merge.
+`.github/workflows/release-watch.yml` runs weekly (and on demand). When Freqtrade publishes a newer stable release than `freqtrade-version.json`, it tests the skills against the new image (`FT_IMAGE` for `scripts/dpy.sh`, `FT_TAG` for `tests/run_all.sh`), runs `scripts/docs_diff.py` and opens an issue titled `Freqtrade <tag> released: refresh skills`. The issue lists changed doc sections mapped to the reference files whose `Source:` lines cite them, plus dangling anchors. The rewrite itself is always a reviewed PR; nothing is committed automatically. Locally: `scripts/dpy.sh` cannot clone (the image has no git), so run `python3 scripts/docs_diff.py --old 2026.9 --new 2026.10` on a host with Python and git, or pass `--old-dir/--new-dir`. Self-test: `bash tests/test_docs_diff.sh`. The version is set only in `freqtrade-version.json`: skills state it once (`Pinned Freqtrade release: <tag>.`) and say "the pinned release" elsewhere. `scripts/bump_version.py NEW_TAG` rewrites image tags, pinned lines, footers and the pin files (workflows, `scripts/dpy.sh`, tests, README) and writes nothing if a hand-written version is left. `scripts/validate_skills.py` fails on a stale or floating image tag (`latest`, `develop`, `stable`, untagged) and on a hand-written version in skill prose. Self-test: `bash tests/test_bump_version.sh`.
 
 ## Contributing
 
