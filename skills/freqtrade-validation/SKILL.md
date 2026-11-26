@@ -7,6 +7,7 @@ license: GPL-3.0
 # Freqtrade validation (safety gate)
 
 Every other freqtrade skill routes here. A strategy is not "done", and its backtest or hyperopt numbers do not count, until `lookahead-analysis` and `recursive-analysis` pass. Freqtrade version assumed: 2026.10. Users trade real money: be strict, and never overstate what a pass proves.
+Sample outputs and trade counts in this skill and its references were observed on Binance sample data (2026-07..10), before the repo test data moved to OKX; rerun the commands on your data, expect different numbers.
 
 Rules:
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives (docs: "not biased and can safely be ignored"). That is the only blanket exception. Pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives (see the interpretation table); each must be explained to the user, never silently ignored.

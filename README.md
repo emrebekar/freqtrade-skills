@@ -61,6 +61,8 @@ Every development skill carries a validation gate. An agent using these skills w
 
 Needs Docker only; no host Python. Scripts run inside the pinned image.
 
+Test data is OKX (spot and perpetual futures, 2026-07-01 to 2026-10-01, 5m and 1h) because GitHub-hosted runners are geo-blocked by Binance (HTTP 451) and freqtrade loads markets from the exchange even for backtests.
+
 ```bash
 bash tests/run_all.sh                 # every strategy in tests/strategies.json: backtest + lookahead + recursive
 bash tests/run_checks.sh SampleSmoke  # one strategy

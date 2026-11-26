@@ -2,3 +2,4 @@ user_data/
 __pycache__/
 *.sqlite
 tests/out/
+tests/data/**/leverage_tiers_*.json
