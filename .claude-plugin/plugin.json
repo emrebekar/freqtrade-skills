@@ -1,7 +1,7 @@
 {
   "name": "freqtrade-skills",
   "description": "Agent Skills for developing Freqtrade strategies: setup, config, strategy, callbacks, backtesting, validation, hyperopt, FreqAI, migration.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": { "name": "emrebekar" },
   "homepage": "https://github.com/emrebekar/freqtrade-skills",
   "repository": "https://github.com/emrebekar/freqtrade-skills",
