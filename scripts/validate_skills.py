@@ -16,6 +16,35 @@ IMAGE_RE = re.compile(r"freqtradeorg/freqtrade(?::([\w.-]*\w))?")
 RELEASE_TAG_RE = re.compile(r"^\d{4}\.\d{1,2}(_[a-z]+)?$")
 FENCE_RE = re.compile(r"^(```|~~~).*?^\1[ \t]*$", re.M | re.S)
 MAX_LINES, MAX_NAME, MAX_DESC = 300, 64, 1024
+# The pinned version may appear in skills only in these forms, which scripts/bump_version.py rewrites.
+# Anywhere else it is hand-written prose: write "the pinned release" instead.
+PIN_LINE_FMT = "Pinned Freqtrade release: {}."
+ALLOWED_FORMS = (
+    r"freqtradeorg/freqtrade:{P}(?:_[a-z]+)?",
+    r"`{P}_[a-z]+`",
+    r"Pinned Freqtrade release: {P}\.",
+    r"^Built from Freqtrade docs {P} \(\S+\)\. Source: https://github\.com/freqtrade/freqtrade/tree/{P}/docs[ \t]*$",
+    r"git checkout {P}",
+    r"freqtrade:{P}#",
+)
+
+
+def mention_re(pinned):
+    """The pinned literal as a whole version, not part of 2026.100 or 12026.10."""
+    return re.compile(rf"(?<![\d.]){re.escape(pinned)}(?!\d)")
+
+
+def allowed_spans(text, pinned):
+    """Character spans of every allowed form of the pinned version in text."""
+    p = re.escape(pinned)
+    return [m.span() for f in ALLOWED_FORMS for m in re.finditer(f.replace("{P}", p), text, re.M)]
+
+
+def stray_mentions(text, pinned):
+    """Line numbers of pinned-version mentions outside the allowed forms."""
+    spans = allowed_spans(text, pinned)
+    return [text.count("\n", 0, m.start()) + 1 for m in mention_re(pinned).finditer(text)
+            if not any(a <= m.start() and m.end() <= b for a, b in spans)]
 
 
 def read(path):
@@ -77,7 +106,11 @@ def check_skill(d, agents_text, pinned=None):
     last = next((ln for ln in reversed(lines) if ln.strip()), "")
     if not FOOTER_RE.match(last):
         errs.append(f"{p}: footer line missing or not the last non-empty line")
-    refs = sorted((d / "references").glob("*.md"))
+    elif pinned and not last.startswith(f"Built from Freqtrade docs {pinned} "):
+        errs.append(f"{p}: footer tag != {pinned}")
+    if pinned and text.count(PIN_LINE_FMT.format(pinned)) != 1:
+        errs.append(f"{p}: pinned line '{PIN_LINE_FMT.format(pinned)}' missing or repeated")
+    refs =sorted((d / "references").glob("*.md"))
     for md_file in [md, *refs]:
         body, rerr = (text, None) if md_file == md else read(md_file)
         if rerr:
@@ -92,6 +125,8 @@ def check_skill(d, agents_text, pinned=None):
             if not RELEASE_TAG_RE.match(tag) or (pinned and tag.split("_")[0] != pinned):
                 want = f" (want {pinned})" if pinned else ""
                 errs.append(f"{md_file}: image 'freqtradeorg/freqtrade:{tag or '(no tag)'}' is not the pinned release tag{want}")
+        for n in stray_mentions(body, pinned) if pinned else []:
+            errs.append(f"{md_file}:{n}: hand-written version '{pinned}', write 'the pinned release'")
         if md_file != md and not body.startswith("Source: "):
             errs.append(f"{md_file}: first line must start with 'Source: '")
     if not re.search(rf"(?<![\w-]){re.escape(d.name)}(?![\w-])", agents_text):

@@ -12,4 +12,6 @@ Nothing to see here.
 df["x"](1)
 ```
 
+Pinned Freqtrade release: 2026.10.
+
 Built from Freqtrade docs 2026.10 (4cf0351e08d26e96a6429ef48103b726bb230cf8). Source: https://github.com/freqtrade/freqtrade/tree/2026.10/docs
