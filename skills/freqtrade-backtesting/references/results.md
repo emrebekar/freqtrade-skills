@@ -5,7 +5,7 @@ Source: docs/backtesting.md#daily-weekly-monthly-yearly-breakdown
 
 # Reading the backtest result
 
-Definitions below are the docs' (2026.10). Comments marked "note" are this skill's guidance, not Freqtrade rules.
+Definitions below are the docs' (pinned release). Comments marked "note" are this skill's guidance, not Freqtrade rules.
 
 ## Tables, in order
 

@@ -3,11 +3,11 @@ Source: docs/strategy_migration.md#freqai-strategy
 
 # Removed and deprecated features
 
-From docs/deprecated.md (2026.10): "no longer supported. Please avoid their usage in your configuration." Everything below is `docs` unless marked `observed` (seen on the 2026.10 image in this repo). Check an old config or strategy against this list before running it; an old option can be an error or can be silently ignored.
+From docs/deprecated.md (pinned release): "no longer supported. Please avoid their usage in your configuration." Everything below is `docs` unless marked `observed` (seen on the pinned image in this repo). Check an old config or strategy against this list before running it; an old option can be an error or can be silently ignored.
 
 ## Removed command line options and config
 
-| Old | Status in 2026.10 | Use instead |
+| Old | Status in the pinned release | Use instead |
 |-----|-------------------|-------------|
 | `--refresh-pairs-cached` (backtesting, hyperopt, edge) | removed in 2019.9 | `freqtrade download-data` |
 | `--dynamic-whitelist` | removed 2019.6/2019.7 | pairlists (freqtrade-config) |
@@ -42,7 +42,7 @@ freqtrade download-data -t 1h --trading-mode futures --candle-types funding_rate
 freqtrade list-data --exchange <yourexchange> --show-timerange
 ```
 
-Docs inconsistency: the docs write `freqtrade list-data --exchange <yourexchange> --show`, but 2026.10 has no `--show` option (`--show-timerange` exists), so the example above uses that. Add the config, exchange and pair options your setup needs. More on informative and funding-rate candles: freqtrade-strategy. Data download: freqtrade-setup.
+Docs inconsistency: the docs write `freqtrade list-data --exchange <yourexchange> --show`, but the pinned release has no `--show` option (`--show-timerange` exists), so the example above uses that. Add the config, exchange and pair options your setup needs. More on informative and funding-rate candles: freqtrade-strategy. Data download: freqtrade-setup.
 
 ## Funding rate data storage format (2026.8, futures)
 
@@ -55,12 +55,12 @@ Strategy changes (docs):
 
 Merge example and details: freqtrade-strategy, references/informative-pairs.md (section "Funding rate and mark candles").
 
-## What still works in 2026.10 (observed)
+## What still works in the pinned release (observed)
 
-Observed on the 2026.10 image, spot mode ([tests/test_migration_fixtures.sh](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/test_migration_fixtures.sh)): the old method names `populate_buy_trend`, `populate_sell_trend`, `custom_sell`, `check_buy_timeout`, `check_sell_timeout`, the `sell_reason` argument of `confirm_trade_exit`, and the old `buy` / `sell` dataframe columns all still load and give the same trades as the migrated version (without a `buy_tag` column; see v2-to-v3.md). The old settings (`use_sell_signal`, `sell_profit_only`, `sell_profit_offset`, `ignore_roi_if_buy_signal`) and the old `order_types`, `order_time_in_force`, `unfilledtimeout` keys log `DEPRECATED` warnings. The docs say compatibility is kept "for now" and "we may drop support for the current interface sometime in the future" with an announced transition period.
+Observed on the pinned image, spot mode ([tests/test_migration_fixtures.sh](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/test_migration_fixtures.sh)): the old method names `populate_buy_trend`, `populate_sell_trend`, `custom_sell`, `check_buy_timeout`, `check_sell_timeout`, the `sell_reason` argument of `confirm_trade_exit`, and the old `buy` / `sell` dataframe columns all still load and give the same trades as the migrated version (without a `buy_tag` column; see v2-to-v3.md). The old settings (`use_sell_signal`, `sell_profit_only`, `sell_profit_offset`, `ignore_roi_if_buy_signal`) and the old `order_types`, `order_time_in_force`, `unfilledtimeout` keys log `DEPRECATED` warnings. The docs say compatibility is kept "for now" and "we may drop support for the current interface sometime in the future" with an announced transition period.
 
-Observed (2026.10 source, strategy resolver; docs do not state it): the loader treats non-spot trading modes strictly. With `trading_mode` other than spot, the old setting names are errors (observed: `ERROR - DEPRECATED: Using 'sell_profit_only' moved to 'exit_profit_only'.` from a futures backtest of the legacy fixture), and per the resolver source the old `populate_buy_trend`, `check_buy_timeout`, `check_sell_timeout` and `custom_sell` raise `OperationalException` ("Please migrate your implementation of ..."). The docs say migrate if you intend to use markets other than spot.
+Observed (pinned release source, strategy resolver; docs do not state it): the loader treats non-spot trading modes strictly. With `trading_mode` other than spot, the old setting names are errors (observed: `ERROR - DEPRECATED: Using 'sell_profit_only' moved to 'exit_profit_only'.` from a futures backtest of the legacy fixture), and per the resolver source the old `populate_buy_trend`, `check_buy_timeout`, `check_sell_timeout` and `custom_sell` raise `OperationalException` ("Please migrate your implementation of ..."). The docs say migrate if you intend to use markets other than spot.
 
 Observed source comment: interface.py says "Default to version 2" above `INTERFACE_VERSION: int = 3`. The value is 3, matching the docs ("3 ... is also the default when it's not set explicitly").
 
-Strategy Interface v1 (populate functions without the `metadata` argument) is rejected: "Strategy Interface v1 is no longer supported" (observed in 2026.10 source). Add the `metadata: dict` argument to `populate_indicators`, `populate_entry_trend` and `populate_exit_trend`.
+Strategy Interface v1 (populate functions without the `metadata` argument) is rejected: "Strategy Interface v1 is no longer supported" (observed in the pinned release source). Add the `metadata: dict` argument to `populate_indicators`, `populate_entry_trend` and `populate_exit_trend`.

@@ -17,7 +17,7 @@ cd freqtrade
 git checkout stable
 ```
 
-`stable` is the last release; `develop` has the newest features. To match the skills in this repo use the 2026.10 release (`git checkout 2026.10`). Installing from pypi (`pip install freqtrade`) needs ta-lib installed beforehand and is not the recommended route.
+`stable` is the last release; `develop` has the newest features. To match the skills in this repo use the pinned release (`git checkout 2026.10`). Installing from pypi (`pip install freqtrade`) needs ta-lib installed beforehand and is not the recommended route.
 
 ## Debian/Ubuntu dependencies
 

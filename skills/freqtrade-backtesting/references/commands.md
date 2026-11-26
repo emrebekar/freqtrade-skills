@@ -7,7 +7,7 @@ Source: docs/commands/backtesting.md
 
 # Backtesting commands and options
 
-All commands below were run on 2026.10 with the repo's test data and strategies, except where marked "docs". Global flags such as `--no-color` go after the subcommand. In Docker, prefix with `docker compose run --rm freqtrade` (see freqtrade-setup).
+All commands below were run on the pinned release with the repo's test data and strategies, except where marked "docs". Global flags such as `--no-color` go after the subcommand. In Docker, prefix with `docker compose run --rm freqtrade` (see freqtrade-setup).
 
 ```bash
 freqtrade backtesting --strategy AwesomeStrategy
@@ -22,7 +22,7 @@ freqtrade backtesting --fee 0.001
 
 `--strategy` takes the class name, not the file name. Backtesting uses the pairs from the config and the data in `user_data/data/<exchange>`; if data is missing it asks you to download it (`freqtrade download-data`). All profit calculations include fees. The starting balance (`--dry-run-wallet` / `--starting-balance` / `dry_run_wallet`) must be higher than `stake_amount`, otherwise no trade can be simulated. `stake_amount: "unlimited"` splits the balance into `max_open_trades` pieces and compounds profits.
 
-## Options (from `freqtrade backtesting --help`, 2026.10)
+## Options (from `freqtrade backtesting --help`, pinned release)
 
 | Option | Meaning |
 |--------|---------|
@@ -45,7 +45,7 @@ freqtrade backtesting --fee 0.001
 | `--freqai-backtest-live-models` | FreqAI: backtest with ready models. |
 | `--data-format-ohlcv` | `json`, `jsongz`, `feather`, `parquet` (default `feather`). |
 
-`--backtest-filename` / `--export-filename` is marked DEPRECATED for `backtesting` in the 2026.10 help: custom file names are no longer supported, use `--backtest-directory`. It still works for `backtesting-analysis`, `backtesting-show` and the plot commands to pick an existing result.
+`--backtest-filename` / `--export-filename` is marked DEPRECATED for `backtesting` in the pinned release's help: custom file names are no longer supported, use `--backtest-directory`. It still works for `backtesting-analysis`, `backtesting-show` and the plot commands to pick an existing result.
 
 ## Timerange
 
@@ -57,7 +57,7 @@ By default a backtest reuses a cached result from within the last day when strat
 
 ## Result files
 
-Observed on 2026.10: a run writes `backtest-result-<timestamp>.zip` and `backtest-result-<timestamp>.meta.json` into `<userdir>/backtest_results/`. The zip held: the result JSON, `_config.json`, a copy of the strategy `.py`, `_market_change.feather`, `_<Strategy>_wallet.feather` and, with `--export signals`, `_signals.pkl`, `_rejected.pkl` and `_exited.pkl`. The docs describe the zip as containing the report JSON, market change, strategy copy, parameters copy (if any) and a sanitized config; only the strategy file and config are saved, not imported modules. Signal exports can be large; delete old results periodically.
+Observed on the pinned release: a run writes `backtest-result-<timestamp>.zip` and `backtest-result-<timestamp>.meta.json` into `<userdir>/backtest_results/`. The zip held: the result JSON, `_config.json`, a copy of the strategy `.py`, `_market_change.feather`, `_<Strategy>_wallet.feather` and, with `--export signals`, `_signals.pkl`, `_rejected.pkl` and `_exited.pkl`. The docs describe the zip as containing the report JSON, market change, strategy copy, parameters copy (if any) and a sanitized config; only the strategy file and config are saved, not imported modules. Signal exports can be large; delete old results periodically.
 
 ## Multiple strategies
 
@@ -73,7 +73,7 @@ All listed strategies must be in the same directory unless `--recursive-strategy
 
 ## Docs inconsistencies found while building this skill
 
-- `docs/advanced-backtesting.md` shows `freqtrade backtesting ... --backtest-filename ...` and says `_signals.pkl` and `_exited.pkl` appear in the results folder. The 2026.10 help marks `--backtest-filename` deprecated for `backtesting`, and the files are inside the result zip (observed). Prefer `--backtest-directory` and let `backtesting-analysis` read the latest result.
+- `docs/advanced-backtesting.md` shows `freqtrade backtesting ... --backtest-filename ...` and says `_signals.pkl` and `_exited.pkl` appear in the results folder. The pinned release's help marks `--backtest-filename` deprecated for `backtesting`, and the files are inside the result zip (observed). Prefer `--backtest-directory` and let `backtesting-analysis` read the latest result.
 - `docs/plotting.md` examples use `--export-filename user_data/backtest_results/backtest-result.json`; results are zips now. Observed: the plot commands found the latest result without that option.
 - `docs/backtesting.md` uses different sample runs in different sections (the table at the start of "Understand the backtesting result" shows `57.157` USDT, the TOTAL-row prose quotes `54.774` USDT / 5.48%). This is not an inconsistency; do not mix numbers across samples.
 - Docs say the breakdown option takes day, week, month, year; the help also lists `weekday`.

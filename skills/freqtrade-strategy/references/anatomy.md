@@ -16,7 +16,7 @@ freqtrade new-strategy --strategy AwesomeStrategy --template minimal
 freqtrade list-strategies
 ```
 
-`--template` accepts `minimal` (empty), `full` (default, many sample indicators) and `advanced` (all callbacks; per the CLI help, verified on 2026.10). Generated templates are starting points and not profitable. Check the template's `startup_candle_count`: the template default can be too low for its own indicators (see "Startup candles").
+`--template` accepts `minimal` (empty), `full` (default, many sample indicators) and `advanced` (all callbacks; per the CLI help, verified on the pinned release). Generated templates are starting points and not profitable. Check the template's `startup_candle_count`: the template default can be too low for its own indicators (see "Startup candles").
 
 ## Required pieces
 

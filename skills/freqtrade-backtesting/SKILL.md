@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade backtesting
 
-Run a strategy over historical candles, read the result honestly, dig into which entries and exits made or lost money. Freqtrade version assumed: 2026.10. Outputs shown below were produced by running the repo's teaching strategy `IndicatorsExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) on the repo's test data (BTC/USDT and ETH/USDT, 5m, 2026-08-01 to 2026-09-30). That strategy is not profitable in any meaningful sense; never present its numbers as a result.
+Run a strategy over historical candles, read the result honestly, dig into which entries and exits made or lost money. Pinned Freqtrade release: 2026.10. Outputs shown below were produced by running the repo's teaching strategy `IndicatorsExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) on the repo's test data (BTC/USDT and ETH/USDT, 5m, 2026-08-01 to 2026-09-30). That strategy is not profitable in any meaningful sense; never present its numbers as a result.
 
 Rules:
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass (see freqtrade-validation). A backtest of a biased strategy is meaningless, so run validation before trusting any number here. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives.
@@ -31,7 +31,7 @@ Rules:
 freqtrade backtesting --strategy MyStrategy --timerange 20260801-20261001 --cache none
 ```
 
-Common options (all verified against `freqtrade backtesting --help` on 2026.10 by the repo's CLI checker):
+Common options (all verified against `freqtrade backtesting --help` on the pinned release by the repo's CLI checker):
 
 | Goal | Option |
 |------|--------|
@@ -124,7 +124,7 @@ freqtrade backtesting-show --breakdown weekday
 
 ### Plotting
 
-`plot-dataframe` and `plot-profit` need Plotly, which the standard images do not contain. Verified on 2026.10: `freqtradeorg/freqtrade:2026.10` and `2026.10_freqai` fail with `ModuleNotFoundError: No module named 'plotly'`; `freqtradeorg/freqtrade:2026.10_plot` exists and generated both HTML plots into `<userdir>/plot/`. Native installs: `pip install -U -r requirements-plot.txt`. The docs mark both commands deprecated (maintenance mode) and recommend FreqUI. Details and `plot_config`: references/plotting.md.
+`plot-dataframe` and `plot-profit` need Plotly, which the standard images do not contain. Verified on the pinned release: `freqtradeorg/freqtrade:2026.10` and `2026.10_freqai` fail with `ModuleNotFoundError: No module named 'plotly'`; `freqtradeorg/freqtrade:2026.10_plot` exists and generated both HTML plots into `<userdir>/plot/`. Native installs: `pip install -U -r requirements-plot.txt`. The docs mark both commands deprecated (maintenance mode) and recommend FreqUI. Details and `plot_config`: references/plotting.md.
 
 ```bash
 freqtrade plot-dataframe --strategy IndicatorsExample -p BTC/USDT --timerange 20260801-20260805 --indicators1 ema_fast ema_slow --indicators2 rsi

@@ -26,6 +26,7 @@ ALLOWED_FORMS = (
     r"^Built from Freqtrade docs {P} \(\S+\)\. Source: https://github\.com/freqtrade/freqtrade/tree/{P}/docs[ \t]*$",
     r"git checkout {P}",
     r"freqtrade:{P}#",
+    r"freqtrade {P}`",  # `--version` output quoted in setup
 )
 
 

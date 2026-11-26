@@ -9,7 +9,7 @@ FreqAI is configured in the normal Freqtrade config (see freqtrade-config) plus 
 
 ## Required keys (docs)
 
-The docs mark `freqai`, `train_period_days`, `backtest_period_days` and `identifier` as **Required**, and the minimal example in the configuration page also sets `purge_old_models`, `feature_parameters` (`include_timeframes`, `include_corr_pairlist`, `label_period_candles`, `include_shifted_candles`, `indicator_periods_candles`) and `data_split_parameters.test_size`. Observed in the 2026.10 image's config schema (config_schema.py): `train_period_days` defaults to 0, `backtest_period_days` to 7 and `identifier` to `"example"`, so a missing key may not fail at load time; set all four explicitly.
+The docs mark `freqai`, `train_period_days`, `backtest_period_days` and `identifier` as **Required**, and the minimal example in the configuration page also sets `purge_old_models`, `feature_parameters` (`include_timeframes`, `include_corr_pairlist`, `label_period_candles`, `include_shifted_candles`, `indicator_periods_candles`) and `data_split_parameters.test_size`. Observed in the pinned image's config schema (config_schema.py): `train_period_days` defaults to 0, `backtest_period_days` to 7 and `identifier` to `"example"`, so a missing key may not fail at load time; set all four explicitly.
 
 `identifier` is a unique name for one run. Keeping it the same keeps saved models and predictions (crash resilience, fast re-backtests). Docs: change it, or delete `user_data/models/<identifier>`, as soon as you try new features or a new model.
 
@@ -44,7 +44,7 @@ Notes on what was observed with it (backtest `--timerange 20260801-20261001`, da
 - First training window `2026-07-17` to `2026-08-01`, i.e. before the backtest range, as the docs describe.
 - `activate_tensorboard: false` because TensorBoard needs the torch image (docs, default true).
 - `model_training_parameters` is passed to the model library (here LightGBM); `verbose: -1` silences its output.
-- Observed 2026.10: `data_split_parameters.shuffle: false` keeps time order; the docs call shuffling a way to reduce bias from autocorrelated data, but unshuffled is the usual time-series choice (docs table: default `False`).
+- Observed on the pinned release: `data_split_parameters.shuffle: false` keeps time order; the docs call shuffling a way to reduce bias from autocorrelated data, but unshuffled is the usual time-series choice (docs table: default `False`).
 
 ## Pairlist rule (docs)
 

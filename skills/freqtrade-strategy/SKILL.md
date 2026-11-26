@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade strategy development
 
-How to write a correct Freqtrade strategy. Freqtrade version assumed: 2026.10, strategy interface version 3. Every example class here was run through backtesting, `lookahead-analysis` and `recursive-analysis` on test data ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)). They are teaching examples, not profitable strategies; never present them as such.
+How to write a correct Freqtrade strategy. Pinned Freqtrade release: 2026.10. Strategy interface version 3. Every example class here was run through backtesting, `lookahead-analysis` and `recursive-analysis` on test data ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)). They are teaching examples, not profitable strategies; never present them as such.
 
 Rules:
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives. A pass does not prove the strategy is clean; it only checks signals that fired in the tested timerange.

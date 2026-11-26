@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade hyperopt
 
-Hyperopt runs the backtester many times with different parameter values and keeps the combination that minimizes a loss function. Freqtrade version assumed: 2026.10. It needs the same historical data as backtesting. Users trade real money: hyperopt is the step where overfitting happens, so say plainly what its output does and does not prove. The example `HyperoptExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) and the custom loss ([tests/hyperopt_losses/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/hyperopt_losses/)) were run on the repo's test data (BTC/USDT and ETH/USDT, 5m, 2026-08-01 to 2026-10-01). They are teaching examples, not profitable strategies; never present their numbers as a result.
+Hyperopt runs the backtester many times with different parameter values and keeps the combination that minimizes a loss function. Pinned Freqtrade release: 2026.10. It needs the same historical data as backtesting. Users trade real money: hyperopt is the step where overfitting happens, so say plainly what its output does and does not prove. The example `HyperoptExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) and the custom loss ([tests/hyperopt_losses/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/hyperopt_losses/)) were run on the repo's test data (BTC/USDT and ETH/USDT, 5m, 2026-08-01 to 2026-10-01). They are teaching examples, not profitable strategies; never present their numbers as a result.
 
 Rules:
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives. That is the only blanket exception: pairlist-dependent logic and limit orders with `custom_entry_price()`/`custom_exit_price()` can also give documented false positives; explain each, never silently ignore. A pass does not prove the strategy is clean (see freqtrade-validation).
@@ -59,7 +59,7 @@ Options on all: `space`, `optimize=False` (not searched), `load=False` (ignore e
 
 ## Which values win: precedence
 
-Docs: config > parameter file (`MyStrategy.json` next to the strategy) > strategy `*_params` > parameter default. Observed on 2026.10: JSON beat strategy `buy_params`, and a config `stoploss` beat the JSON. A leftover JSON file silently changes backtests: read the `Strategy Parameter: ...` log lines. Details: references/results-overfitting.md.
+Docs: config > parameter file (`MyStrategy.json` next to the strategy) > strategy `*_params` > parameter default. Observed on the pinned release: JSON beat strategy `buy_params`, and a config `stoploss` beat the JSON. A leftover JSON file silently changes backtests: read the `Strategy Parameter: ...` log lines. Details: references/results-overfitting.md.
 
 ## Overfitting (read this before showing results)
 

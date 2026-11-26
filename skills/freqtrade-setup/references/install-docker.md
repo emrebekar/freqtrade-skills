@@ -39,7 +39,7 @@ sed -i 's#freqtrade:stable#freqtrade:2026.10#' docker-compose.yml
 docker compose run --rm freqtrade --version
 ```
 
-On macOS use `sed -i ''`. The version check must print `Freqtrade Version:	freqtrade 2026.10` (observed). To run a newer release, pin that exact `YYYY.M` tag instead and tell the user that commands and sample outputs in these skills were checked on 2026.10.
+On macOS use `sed -i ''`. The version check must print `Freqtrade Version:	freqtrade 2026.10` (observed). To run a newer release, pin that exact `YYYY.M` tag instead and tell the user that commands and sample outputs in these skills were checked on the pinned release.
 
 ## Running commands
 

@@ -64,7 +64,7 @@ def adjust_order_price(
 - If cancelling fails the order is not replaced. Partially filled orders are not replaced; use `adjust_trade_position()` to fix the size.
 - `adjust_entry_price()` (entry orders only) and `adjust_exit_price()` (exit orders only) are the split versions with otherwise identical behavior. Implementing `adjust_order_price()` together with either split callback is not supported and raises an error at bot startup (docs); the docs say that if both exist only `adjust_order_price()` is used, which contradicts "raises an error", so implement only one family.
 - `trade.open_date_utc` stays at the very first order's time; use the first filled order's date when needed.
-- The docs do not show the split callbacks' signatures. Read with `inspect.signature` from the 2026.10 image, both are `(self, trade: Trade, order: Order | None, pair: str, current_time: datetime, proposed_rate: float, current_order_rate: float, entry_tag: str | None, side: str, **kwargs) -> float | None` (no `is_entry`). Re-check against your installed version.
+- The docs do not show the split callbacks' signatures. Read with `inspect.signature` from the pinned image, both are `(self, trade: Trade, order: Order | None, pair: str, current_time: datetime, proposed_rate: float, current_order_rate: float, entry_tag: str | None, side: str, **kwargs) -> float | None` (no `is_entry`). Re-check against your installed version.
 
 ## order_filled
 

@@ -14,7 +14,7 @@ Define parameters at class level, then read them with `self.<name>.value` inside
 
 Docs say "four parameter types" but list five.
 
-| Type | Use | Constructor (read from the 2026.10 image, observed) |
+| Type | Use | Constructor (read from the pinned image, observed) |
 |------|-----|------------------------------------------------------|
 | `IntParameter` | whole numbers | `(low, high=None, *, default, space=None, optimize=True, load=True)` |
 | `DecimalParameter` | floats with limited decimals (docs: default 3, preferred over `RealParameter`) | `(low, high=None, *, default, decimals=3, space=None, optimize=True, load=True)` |

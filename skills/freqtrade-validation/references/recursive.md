@@ -9,7 +9,7 @@ Source: docs/strategy-customization.md#strategy-startup-period
 
 A recursive formula defines a term from previous terms (EMA, RSI and many others). In backtesting the bot has the full range; in dry/live it gets only what the exchange returns. Example in the docs: an indicator `steps` that adds 1 per row is 999 at the last of 1000 candles but 499 if only 500 candles were used. So a backtest can differ from dry/live.
 
-## Options (2026.10 help)
+## Options (pinned release's help)
 
 ```bash
 freqtrade recursive-analysis --strategy MyStrategy --timerange 20260801-20261001 -p BTC/USDT --startup-candle 199 499 999 1999

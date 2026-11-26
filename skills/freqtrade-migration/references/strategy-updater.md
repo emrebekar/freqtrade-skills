@@ -3,7 +3,7 @@ Source: docs/strategy_migration.md
 
 # strategy-updater
 
-`freqtrade strategy-updater` rewrites strategy files to the v3 interface automatically. The docs page is only the `--help` output; the behavior below is `observed` on the 2026.10 image ([tests/test_migration_fixtures.sh](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/test_migration_fixtures.sh) and the scratch runs under tests/out/updater*, plus reading the shipped `freqtrade/strategy/strategyupdater.py`). Treat the updater as a first pass to diff and fix by hand, never as the migration.
+`freqtrade strategy-updater` rewrites strategy files to the v3 interface automatically. The docs page is only the `--help` output; the behavior below is `observed` on the pinned image ([tests/test_migration_fixtures.sh](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/test_migration_fixtures.sh) and the scratch runs under tests/out/updater*, plus reading the shipped `freqtrade/strategy/strategyupdater.py`). Treat the updater as a first pass to diff and fix by hand, never as the migration.
 
 ## Usage
 

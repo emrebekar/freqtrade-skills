@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade setup
 
-Get from nothing to a working user directory, a dry-run config, a strategy file and downloaded data. Freqtrade version assumed: 2026.10.
+Get from nothing to a working user directory, a dry-run config, a strategy file and downloaded data. Pinned Freqtrade release: 2026.10.
 
 Rules for every step below:
 - Start with `dry_run: true`. Never put exchange API keys in a config you commit or share (see the freqtrade-config skill).

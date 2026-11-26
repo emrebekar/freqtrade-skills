@@ -7,7 +7,7 @@ Source: docs/commands/list-hyperoptloss.md
 
 A custom loss is a class that subclasses `IHyperOptLoss` and defines the static method `hyperopt_loss_function`. Select it with `--hyperopt-loss ClassName` (or `"hyperopt_loss"` in the config). Docs: the class lives in its own file in `user_data/hyperopts/` (or in a directory given with `--hyperopt-path PATH`). It is called once per epoch, so keep it fast. It must return a `float`; smaller is better.
 
-## Signature (verbatim from the docs, 2026.10)
+## Signature (verbatim from the docs, pinned release)
 
 ```python
 from datetime import datetime
@@ -58,7 +58,7 @@ class SuperDuperHyperOptLoss(IHyperOptLoss):
         return result
 ```
 
-Docs example problems (observed by reading, the class itself was not run): it calls `exp()` but imports no `exp` (add `from math import exp`), it imports `Dict` but uses `dict[...]`, and it calls itself "identical to the Default Hyperopt loss implementation" while the 2026.10 loader lists `DefaultHyperOptLoss` and `ShortTradeDurHyperOptLoss` as separate names from the same file. Copy the signature, not the body.
+Docs example problems (observed by reading, the class itself was not run): it calls `exp()` but imports no `exp` (add `from math import exp`), it imports `Dict` but uses `dict[...]`, and it calls itself "identical to the Default Hyperopt loss implementation" while the pinned release's loader lists `DefaultHyperOptLoss` and `ShortTradeDurHyperOptLoss` as separate names from the same file. Copy the signature, not the body.
 
 ## Arguments (docs)
 
@@ -113,7 +113,7 @@ class MinTradesSharpeHyperOptLoss(IHyperOptLoss):
         return -returns.mean() / (returns.std() + 1e-9)  # smaller is better, so negate
 ```
 
-Run (the docs import `from freqtrade.optimize.hyperopt import IHyperOptLoss` worked in 2026.10):
+Run (the docs import `from freqtrade.optimize.hyperopt import IHyperOptLoss` worked in the pinned release):
 
 ```bash
 freqtrade hyperopt --strategy HyperoptExample --hyperopt-path tests/hyperopt_losses --hyperopt-loss MinTradesSharpeHyperOptLoss --spaces buy sell -e 5 -j 1 --random-state 42

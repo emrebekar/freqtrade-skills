@@ -6,7 +6,7 @@ license: GPL-3.0
 
 # Freqtrade strategy callbacks
 
-Callbacks are strategy methods the bot calls "whenever needed" (during a trade, or when entering or exiting), unlike `populate_*` which are vectorized. Freqtrade version assumed: 2026.10. The example classes `CallbacksExample` and `PositionAdjustExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) were run through backtesting, `lookahead-analysis` and `recursive-analysis` on test data, and the backtest exports were inspected to confirm each callback fired (see "What the tests showed"). They are teaching examples, not profitable strategies; never present them as such.
+Callbacks are strategy methods the bot calls "whenever needed" (during a trade, or when entering or exiting), unlike `populate_*` which are vectorized. Pinned Freqtrade release: 2026.10. The example classes `CallbacksExample` and `PositionAdjustExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) were run through backtesting, `lookahead-analysis` and `recursive-analysis` on test data, and the backtest exports were inspected to confirm each callback fired (see "What the tests showed"). They are teaching examples, not profitable strategies; never present them as such.
 
 Rules:
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives. A pass does not prove the strategy is clean; it only checks signals that fired in the tested timerange.
