@@ -11,7 +11,7 @@ cd "$(dirname "$0")/.."
 STRATEGY="$1"; shift
 LOSSPATH=""; EPOCHS=5; SPACES="buy sell"; LOSS="SharpeHyperOptLossDaily"; CONFIG="tests/config.test.json"
 SPATH="tests/strategies"; IMAGE="freqtradeorg/freqtrade:2026.10"
-DATADIR="tests/data/binance"
+DATADIR="tests/data/okx"
 TIMERANGE="20260801-20260915" # in-sample part only; 20260915-20261001 stays unseen for validation
 while [ $# -gt 0 ]; do
   case "$1" in

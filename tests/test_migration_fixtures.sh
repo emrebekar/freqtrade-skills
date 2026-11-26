@@ -15,7 +15,7 @@ rm -rf "$OUT" && mkdir -p "$OUT/legacy" "$OUT/migrated" "$OUT/updated" "$OUT/upd
 run "$IMAGE" create-userdir --userdir "$USERDIR" >"$OUT/create-userdir.log" 2>&1 || { echo "setup: FAIL"; exit 1; }
 fail=0
 bt() { # <strategy> <strategy-path> <resultdir> <log>
-  run "$IMAGE" backtesting -c tests/config.test.json --userdir "$USERDIR" -d tests/data/binance \
+  run "$IMAGE" backtesting -c tests/config.test.json --userdir "$USERDIR" -d tests/data/okx \
     --timerange 20260801-20261001 --strategy-path "$2" -s "$1" --no-color \
     --export trades --backtest-directory "$3" >"$4" 2>&1
 }

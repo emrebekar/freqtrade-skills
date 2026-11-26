@@ -7,6 +7,7 @@ license: GPL-3.0
 # Freqtrade backtesting
 
 Run a strategy over historical candles, read the result honestly, dig into which entries and exits made or lost money. Pinned Freqtrade release: 2026.10. Outputs shown below were produced by running the repo's teaching strategy `IndicatorsExample` ([tests/strategies/](https://github.com/emrebekar/freqtrade-skills/tree/main/tests/strategies/)) on the repo's test data (BTC/USDT and ETH/USDT, 5m, 2026-08-01 to 2026-09-30). That strategy is not profitable in any meaningful sense; never present its numbers as a result.
+Sample outputs and trade counts in this skill and its references were observed on Binance sample data (2026-07..10), before the repo test data moved to OKX; rerun the commands on your data, expect different numbers.
 
 Rules:
 - Do not call a strategy finished, and do not suggest dry-run or live trading, until `lookahead-analysis` and `recursive-analysis` pass (see freqtrade-validation). A backtest of a biased strategy is meaningless, so run validation before trusting any number here. Exception: FreqAI columns set in `set_freqai_targets()` can be reported as look-ahead false positives.

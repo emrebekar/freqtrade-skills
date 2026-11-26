@@ -15,7 +15,7 @@ fail=0
 for spec in LookaheadBad:flagged LookaheadBadMean:flagged LookaheadBadZscore:flagged LookaheadBadIloc:flagged \
             LookaheadBadResample:flagged LookaheadBadMerge:missed LookaheadBadMacd1:missed; do
   s="${spec%%:*}"; want="${spec##*:}"; csv="$OUT/$s.csv"; rm -f "$csv"
-  run "$IMAGE" lookahead-analysis -c tests/config.test.json --userdir "$USERDIR" -d tests/data/binance \
+  run "$IMAGE" lookahead-analysis -c tests/config.test.json --userdir "$USERDIR" -d tests/data/okx \
     --timerange 20260801-20261001 --strategy-path tests/fixtures/strategies -s "$s" --no-color \
     --lookahead-analysis-exportfilename "$csv" >"$OUT/$s.log" 2>&1
   if [ ! -f "$csv" ]; then echo "$s: FAIL (no result; see $OUT/$s.log)"; fail=1; continue; fi
