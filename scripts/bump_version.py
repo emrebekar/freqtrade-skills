@@ -21,7 +21,7 @@ REPO_URL = "https://github.com/freqtrade/freqtrade"
 # Non-skill files that pin the release: the old tag is replaced as a whole version.
 PIN_GLOBS = (".github/workflows/*.yml", "scripts/dpy.sh", "tests/*.sh", "tests/strategies.json",
              "tests/check_results.py", "tests/fixtures/**/SKILL.md", "README.md")
-SKIP_PREFIX = "tests/fixtures/bump/"  # the bump self-test fixture stays at its own tag
+SKIP_PREFIXES = ("tests/fixtures/bump/", "tests/test_bump_version.sh")  # bump self-test and fixture stay at their own tag
 
 
 def read(path):
@@ -60,7 +60,7 @@ def plan_changes(root, old, new, commit):
         changes[f] = bump_skill(text, old, new, commit)
     for pattern in PIN_GLOBS:
         for f in sorted(root.glob(pattern)):
-            if f.relative_to(root).as_posix().startswith(SKIP_PREFIX):
+            if f.relative_to(root).as_posix().startswith(SKIP_PREFIXES):
                 continue
             changes[f] = mention_re(old).sub(new, read(f))
     vfile = root / "freqtrade-version.json"

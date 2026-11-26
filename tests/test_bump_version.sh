@@ -12,13 +12,14 @@ bump() { $PY scripts/bump_version.py "$@" --root "$T" 2>&1; }
 fresh
 out=$(bump 2026.11 --docs-commit abc123); rc=$?
 [ $rc -eq 0 ] || bad "bump exit $rc: $out"
-grep -rq '2026\.10' "$T" && bad "old tag left: $(grep -rn '2026\.10' "$T")"
+grep -rq --exclude=test_bump_version.sh '2026\.10' "$T" && bad "old tag left: $(grep -rn '2026\.10' "$T")"
 grep -q 'Pinned Freqtrade release: 2026.11\.' "$T/skills/x/SKILL.md" || bad "pinned line not bumped"
 grep -q 'docs 2026.11 (abc123)\. Source: https://github.com/freqtrade/freqtrade/tree/2026.11/docs' "$T/skills/x/SKILL.md" || bad "footer not bumped"
 grep -q 'removed in 2019.9; timerange 20261001-20261101' "$T/skills/x/SKILL.md" || bad "historical version or timerange changed"
 grep -q 'freqtrade 2026.11`' "$T/skills/x/SKILL.md" || bad "version output not bumped"
 [ "$(grep -c $'\r' "$T/skills/x/references/r.md")" -gt 0 ] || bad "CRLF lost"
 grep -q '"tag": "2026.11"' "$T/freqtrade-version.json" && grep -q '"image": "freqtradeorg/freqtrade:2026.11"' "$T/freqtrade-version.json" && grep -q '"docs_commit": "abc123"' "$T/freqtrade-version.json" || bad "json not bumped"
+grep -q "fixture tag: 2026.10" "$T/tests/test_bump_version.sh" || bad "bump self-test was rewritten"
 grep -q '2026.11_freqai' "$T/tests/strategies.json" && grep -q 'freqtrade:2026.11}' "$T/scripts/dpy.sh" || bad "pin files not bumped"
 
 cp -r "$T" "$T.once"
