@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Validate Agent Skills. Usage: validate_skills.py [--root DIR] [--agents FILE]. Stdlib only."""
+"""Validate Agent Skills. Usage: validate_skills.py [--root DIR] [--agents FILE] [--version-file FILE]. Stdlib only."""
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -9,7 +10,8 @@ ALLOWED_KEYS = {"name", "description", "license"}
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 LINK_RE = re.compile(r"(?<!!)\[[^\]]*\]\(([^)\s]+)[^)]*\)")
 FOOTER_RE = re.compile(r"^Built from Freqtrade docs \S+ \(\S+\)\. Source: https://github\.com/freqtrade/freqtrade/tree/\S+/docs\s*$", re.M)
-# Docker images must name a release tag (YYYY.M plus optional flavor); latest/develop*/stable or no tag drift from the docs.
+# Docker images must name the pinned release tag (freqtrade-version.json, plus optional flavor); latest/develop*/stable,
+# no tag or a stale release drift from the docs. A missed bump after a new release fails here.
 IMAGE_RE = re.compile(r"freqtradeorg/freqtrade(?::([\w.-]*\w))?")
 RELEASE_TAG_RE = re.compile(r"^\d{4}\.\d{1,2}(_[a-z]+)?$")
 FENCE_RE = re.compile(r"^(```|~~~).*?^\1[ \t]*$", re.M | re.S)
@@ -40,7 +42,7 @@ def parse_frontmatter(lines):
     return fm, None
 
 
-def check_skill(d, agents_text):
+def check_skill(d, agents_text, pinned=None):
     errs = []
     md = d / "SKILL.md"
     if not md.is_file():
@@ -87,8 +89,9 @@ def check_skill(d, agents_text):
             if not (md_file.parent / target.split("#")[0]).exists():
                 errs.append(f"{md_file}: broken link '{target}'")
         for tag in IMAGE_RE.findall(body):
-            if not RELEASE_TAG_RE.match(tag):
-                errs.append(f"{md_file}: image 'freqtradeorg/freqtrade:{tag or '(no tag)'}' is not a pinned release tag")
+            if not RELEASE_TAG_RE.match(tag) or (pinned and tag.split("_")[0] != pinned):
+                want = f" (want {pinned})" if pinned else ""
+                errs.append(f"{md_file}: image 'freqtradeorg/freqtrade:{tag or '(no tag)'}' is not the pinned release tag{want}")
         if md_file != md and not body.startswith("Source: "):
             errs.append(f"{md_file}: first line must start with 'Source: '")
     if not re.search(rf"(?<![\w-]){re.escape(d.name)}(?![\w-])", agents_text):
@@ -100,6 +103,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default="skills")
     ap.add_argument("--agents", default="AGENTS.md")
+    ap.add_argument("--version-file", default="freqtrade-version.json")
     a = ap.parse_args()
     root, agents = Path(a.root), Path(a.agents)
     if not root.is_dir():
@@ -112,7 +116,16 @@ def main():
     if rerr:
         print(rerr)
         return 1
-    errs = [e for d in sorted(p for p in root.iterdir() if p.is_dir()) for e in check_skill(d, agents_text)]
+    vtext, rerr = read(Path(a.version_file))
+    if rerr:
+        print(rerr)
+        return 1
+    try:
+        pinned = json.loads(vtext)["tag"]
+    except (ValueError, KeyError, TypeError) as e:
+        print(f"{a.version_file}: no 'tag' ({e})")
+        return 1
+    errs = [e for d in sorted(p for p in root.iterdir() if p.is_dir()) for e in check_skill(d, agents_text, pinned)]
     if errs:
         print("\n".join(errs))
     return 1 if errs else 0
